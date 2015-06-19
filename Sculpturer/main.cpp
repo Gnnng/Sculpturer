@@ -11,49 +11,32 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #include <GLUT/GLUT.h>
+#include "World.h"
+#include "Object.h"
 
 using namespace std;
 
-GLfloat bgColor[4] = {0.1, 0.1, 0.1, 0};
-
-bool init() {
-    glClearColor(bgColor[0], bgColor[1], bgColor[2], bgColor[3]);
-    glColor3f(0, 0, 0);
-    
-    return true;
-}
-
-void display() {
-    glClear(GL_COLOR_BUFFER_BIT);
-    
-    glShadeModel(GL_SMOOTH);
-    
-    glEnable(GL_DEPTH_BUFFER_BIT);
-    
-    glBegin(GL_TRIANGLES);
-    glColor3f(0, 1, 1);
-    glVertex2f(0, 0);
-    glVertex2f(0, 0.5);
-    glVertex2f(0.5, 0);
-    glEnd();
-    
-    glFlush();
-    
-    glutSwapBuffers();
-}
+World* globe; // current world to render
 
 int main(int argc, char * argv[]) {
+    globe = new World();
     
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
-    
+    glutInitWindowSize(800, 600);
     glutCreateWindow("A Demo");
-    
-    glutDisplayFunc(display);
-    
-    init();
-    
-    std::cout << "glut version is " << glGetString(GL_VERSION) << std::endl;
+
+    glutDisplayFunc([]() {
+        globe->display();
+    });
+    glutReshapeFunc([](int w, int h) {
+        globe->reshape(w, h);
+    });
+    glutKeyboardFunc([](unsigned char key, int x, int y) {
+        globe->keyboard(key, x, y);
+    });
+
     glutMainLoop();
+
     return 0;
 }
