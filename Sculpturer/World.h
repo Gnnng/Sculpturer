@@ -31,7 +31,8 @@ public:
     
 private:
     vector<Object *> objs;
-    std::array<GLfloat, 4> bg_color;
+    std::array<GLclampf, 4> bg_color;
+    bool init_done;
 };
 
 #endif /* defined(__Sculpturer__World__) */

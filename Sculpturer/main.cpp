@@ -37,7 +37,9 @@ int main(int argc, char * argv[]) {
     glutKeyboardFunc([](unsigned char key, int x, int y) {
         globe->keyboard(key, x, y);
     });
-
+    glutIdleFunc([](){
+        glutPostRedisplay();
+    });
     glutMainLoop();
 
     return 0;

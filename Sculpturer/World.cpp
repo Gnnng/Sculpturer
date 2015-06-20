@@ -7,6 +7,7 @@
 //
 
 #include "World.h"
+#include <cstdlib>
 
 World::World() {
 
@@ -19,21 +20,16 @@ World::~World() {
 
 void World::init() {
     glClearColor(bg_color[0], bg_color[1], bg_color[2], bg_color[3]);
-    glColor3f(0, 0, 0);
+    init_done = true;
 }
 
 void World::display() {
+    if (not init_done)
+        init();
     glClear(GL_COLOR_BUFFER_BIT);
     
     glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_BUFFER_BIT);
-    
-//    glColor3f(1, 0, 0);
-//    glBegin(GL_TRIANGLES);
-//    glVertex2f(0, 0);
-//    glVertex2f(0, 0.5);
-//    glVertex2f(0.5, 0);
-//    glEnd();
     
     for(auto &&obj: objs) {
         obj->display();
@@ -48,7 +44,23 @@ void World::reshape(int width, int height) {
 }
 
 void World::keyboard(unsigned char key, int x, int y) {
-    
+    switch (key) {
+        case 27:
+            exit(0);
+            break;
+        case 's':
+            for(auto &&obj: objs) {
+                obj->display_mode = Object::DisplayMode::solid;
+            }
+            break;
+        case 'w':
+            for(auto &&obj: objs) {
+                obj->display_mode = Object::DisplayMode::wire;
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 void World::workspace() {
