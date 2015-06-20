@@ -25,8 +25,12 @@ public:
     void display();
     void reshape(int width, int height);
     void keyboard(unsigned char key, int x, int y);
+    
+    void workspace();
+    void add(Object *o);
+    
 private:
-    vector<Object> objs;
+    vector<Object *> objs;
     std::array<GLfloat, 4> bg_color;
 };
 

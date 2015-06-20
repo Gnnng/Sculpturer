@@ -26,6 +26,8 @@ int main(int argc, char * argv[]) {
     glutInitWindowSize(800, 600);
     glutCreateWindow("A Demo");
 
+    globe->workspace();
+    
     glutDisplayFunc([]() {
         globe->display();
     });

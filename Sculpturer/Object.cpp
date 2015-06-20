@@ -19,6 +19,11 @@ Object::Object() {
     nx = x_axis;
     ny = y_axis;
     nz = z_axis;
+    display_mode = DisplayMode::solid;
+}
+
+void Object::display() {
+    
 }
 
 Object::~Object() {
@@ -29,7 +34,7 @@ Object::~Object() {
 GLfloat Cube::default_size_factor = 1.0;
 
 Cube::Cube() {
-
+    w = h = d = 1;
 }
 
 Cube::~Cube() {

@@ -18,10 +18,12 @@
 
 
 class Object {
+friend class World;
+
 public:
     Object();
-    virtual ~Object() = 0;
-    virtual void display() = 0;
+    virtual ~Object();
+    virtual void display();
     
 // Global variables
     static std::array<GLfloat, 3> x_axis, y_axis, z_axis;
@@ -38,13 +40,14 @@ protected:
 };
 
 class Cube :public Object{
+friend class World;
 public:
     Cube();
     virtual ~Cube();
     virtual void display();
 
     static GLfloat default_size_factor;
-private:
+protected:
     GLfloat w, h, d;                            // width, height, depth
 
 };
