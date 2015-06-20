@@ -10,8 +10,11 @@
 #include <cstdlib>
 
 World::World() {
-
-    bg_color = {0, 0, 0, 1};
+    
+    // color reference: http://zhongguose.com/#tiehui
+    bg_color = {55.0/255, 68.0/255, 75.0/255, 1};
+    
+    init_done = false;
 }
 
 World::~World() {
