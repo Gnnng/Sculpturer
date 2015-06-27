@@ -18,38 +18,36 @@
 
 
 class Object {
-friend class World;
-
 public:
-    Object();
-    virtual ~Object();
-    virtual void display();
-    
-// Global variables
     static std::array<GLfloat, 3> x_axis, y_axis, z_axis;
-    static enum class DisplayMode {
+    
+    enum class DisplayMode : int {
         wire,
         solid
     };
-protected:
-    GLfloat cx, cy, cz;                         // center (x,y,z)
-    std::array<GLfloat, 3> nx, ny, nz;          // three axies vector
     
+    std::array<GLfloat, 3> center;              // center (x,y,z)
+    std::array<GLfloat, 3> nx, ny, nz;          // three axies vector
+    GLdouble w, h, d;                           // x_factor, y_factor, z_factror
+    std::array<GLdouble, 4> rotate;
     DisplayMode display_mode;
-
+    
+    Object() :
+    center({0, 0, 0}),
+    nx(x_axis), ny(y_axis), nz(z_axis),
+    w(1), h(1), d(1),
+    display_mode(DisplayMode::solid),
+    rotate({0, 0, 1, 0})
+    {}
+    virtual ~Object() {}
+    virtual void display() = 0;
 };
 
 class Cube :public Object{
-friend class World;
 public:
-    Cube();
-    virtual ~Cube();
+    static GLfloat default_size_factor;         //
+    
     virtual void display();
-
-    static GLfloat default_size_factor;
-protected:
-    GLfloat w, h, d;                            // width, height, depth
-
 };
 
 

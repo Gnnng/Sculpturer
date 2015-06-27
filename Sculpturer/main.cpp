@@ -23,11 +23,11 @@ int main(int argc, char * argv[]) {
     
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
-    glutInitWindowSize(800, 600);
-    glutCreateWindow("A Demo");
-
-    globe->workspace();
+    glutInitWindowSize(globe->view_port_size[0], globe->view_port_size[1]);
+    glutCreateWindow("Sculpturer");
     
+    globe->workspace();
+
     glutDisplayFunc([]() {
         globe->display();
     });

@@ -11,60 +11,38 @@
 using namespace std;
 
 std::array<GLfloat, 3> Object::x_axis = {1., 0., 0.};
-std::array<GLfloat, 3> Object::y_axis = {1., 0., 0.};
-std::array<GLfloat, 3> Object::z_axis = {1., 0., 0.};
+std::array<GLfloat, 3> Object::y_axis = {0., 1., 0.};
+std::array<GLfloat, 3> Object::z_axis = {0., 0., 1.};
 
-Object::Object() {
-    cx = cy = cz = 0;
-    nx = x_axis;
-    ny = y_axis;
-    nz = z_axis;
-    display_mode = DisplayMode::solid;
-}
-
-void Object::display() {
-    
-}
-
-Object::~Object() {
-    
-}
 // Class Cube
 
 GLfloat Cube::default_size_factor = 1.0;
 
-Cube::Cube() {
-    w = h = d = 1;
-}
-
-Cube::~Cube() {
-    
-}
-
 void Cube::display() {
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-    
+    rotate[0] += 0.3;
+//    glMatrixMode(GL_MODELVIEW);
+//    glPushMatrix();
+//    glLoadIdentity();
+//    
     // 3. translate
-    glTranslatef(cx, cy, cz);
+    glTranslatef(center[0], center[1], center[2]);
     // 2. rotate
-    glRotatef(0, 0, 0, 0);
+    glRotated(rotate[0], rotate[1], rotate[2], rotate[3]);
     // 1. scale
-    glScalef(w, h, d);
-
+    glScaled(w, h, d);
+    // color
+    glColor3d(1, 0, 0);
     switch (display_mode) {
         case Object::DisplayMode::wire:
-            glutWireCube(1.0);
+            glutWireCube(default_size_factor);
             break;
         case Object::DisplayMode::solid:
-            glutSolidCube(1.0);
+            glutSolidCube(default_size_factor);
             break;
         default:
-            glutWireCube(1.0);
+            glutWireCube(default_size_factor);
             break;
     }
-    glPopMatrix();
 }
 
 

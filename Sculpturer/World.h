@@ -14,10 +14,17 @@
 #include "Object.h"
 #include <functional>
 
-using namespace std;
-
 class World {
 public:
+    std::vector<Object *>       objs;
+    std::array<GLclampf, 4>     bg_color;
+    std::array<GLdouble, 4>     perspective_para;
+    std::array<GLint, 2>        view_port_size;
+    std::array<GLdouble, 3>     eye;
+    std::array<GLdouble, 3>     look_c;
+    
+    bool init_done;
+
     World();
     ~World();
     
@@ -28,11 +35,6 @@ public:
     
     void workspace();
     void add(Object *o);
-    
-private:
-    vector<Object *> objs;
-    std::array<GLclampf, 4> bg_color;
-    bool init_done;
 };
 
 #endif /* defined(__Sculpturer__World__) */

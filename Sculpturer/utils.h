@@ -39,5 +39,12 @@
         std::endl;\
     } while (0)
 
+#define LOG(msg) \
+    do { \
+        if (DEBUG_TEST_COND) \
+        std::cout << "[LOG] " << __DB_POS__ \
+        msg << \
+        std::endl; \
+    } while (0)
 
 #endif /* __UTILS_H__ */
