@@ -13,6 +13,7 @@
 #include <GLUT/GLUT.h>
 #include "World.h"
 #include "Object.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -22,9 +23,14 @@ int main(int argc, char * argv[]) {
     globe = new World();
     
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_MULTISAMPLE | GLUT_DEPTH | GLUT_ACCUM );
     glutInitWindowSize(globe->view_port_size[0], globe->view_port_size[1]);
     glutCreateWindow("Sculpturer");
+    
+    DBVAR(glGetString(GL_VERSION));
+    DBVAR(glGetString(GL_VENDOR));
+    DBVAR(glGetString(GL_RENDERER));
+    DBVAR(GLUT_API_VERSION);
     
     globe->workspace();
 
@@ -40,6 +46,8 @@ int main(int argc, char * argv[]) {
     glutIdleFunc([](){
         glutPostRedisplay();
     });
+    
+
     glutMainLoop();
 
     return 0;
