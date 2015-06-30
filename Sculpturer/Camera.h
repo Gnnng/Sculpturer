@@ -19,15 +19,20 @@ public:
     std::array<GLdouble, 3>     eye;
     GLdouble                    rotate_x, rotate_y, rotate_z;
     GLdouble                    move_step, turn_step;
-    
+    bool                        auto_move_flag;
+    MoveDir                     last_move_dir;
+    GLdouble                    last_move_dist;
+    GLdouble                    auto_move_count;
+
     Camera(std::array<GLdouble, 3> e) :
         eye(e), move_step(0.1), turn_step(0.1),
-        rotate_x(0), rotate_y(0), rotate_z(0) {}
+        rotate_x(0), rotate_y(0), rotate_z(0), auto_move_flag(false) {}
     
-    void default_move_control(int key);
-    void reset_rotate() { rotate_x = rotate_y = rotate_z = 0; }
+    void resetRotate() { rotate_x = rotate_y = rotate_z = 0; }
     void turn(TurnDir dir, GLdouble angle);
-    void move(MoveDir dir, GLdouble dist);
+    void move(MoveDir dir, GLdouble dist, bool auto_call);
+    void autoMove();
+    
     void updateLookAt();
 };
 

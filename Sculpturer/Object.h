@@ -26,17 +26,19 @@ public:
     std::array<GLdouble, 4> rotate;
     DisplayMode display_mode;
     bool select_flag;
+    bool auto_rot_flag;
     
     Object() :
     center({0, 0, 0}),
     nx(x_axis), ny(y_axis), nz(z_axis),
     w(1), h(1), d(1),
     display_mode(DisplayMode::solid),
-    rotate({0, 0, 1, 0})
+    rotate({0, 0, 1, 0}),
+    auto_rot_flag(false)
     {}
-    
+
     bool isSelected() { return select_flag; }
-    
+    void autoRotate() { if (auto_rot_flag) rotate[0] += 1; };
     void drawAxis(GLfloat size);
     virtual ~Object() {}
     virtual void display() = 0;
@@ -46,6 +48,8 @@ class Cube :public Object{
 public:
     static GLfloat default_size_factor;         //
     
+    Cube() { color = {86, 149, 151}; }
+    Cube(GLubyte r, GLubyte g, GLubyte b) { color = {r, g, b}; }
     virtual void display();
 };
 

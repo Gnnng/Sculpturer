@@ -48,7 +48,12 @@ int main(int argc, char * argv[]) {
     glutIdleFunc([](){
         glutPostRedisplay();
     });
-
+    
+    // TODO: couldn't use c++11 lambda like those above
+    glutTimerFunc(globe->update_time, World::auto_update, 0);
+    
+    glEnable(GL_ARB_multisample);
+    
     glutMainLoop();
 
     return 0;

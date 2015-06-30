@@ -11,21 +11,18 @@
 
 #include "Camera.h"
 
-void Camera::default_move_control(int key) {
-    switch (key) {
-        case 'w': move(MoveDir::forward, 1); break;
-        case 's': move(MoveDir::rear, 1); break;
-        case 'a': move(MoveDir::left, 1); break;
-        case 'd': move(MoveDir::right, 1); break;
-        case 'q': move(MoveDir::up, 1); break;
-        case 'e': move(MoveDir::down, 1); break;
-        case ' ': reset_rotate(); break;
-        default:
-            break;
-    }
-}
+void Camera::move(MoveDir dir, GLdouble dist, bool auto_call) {
+    if (auto_move_flag) {
+        last_move_dir = dir;
+        last_move_dist = dist;
+        if (auto_call) {
 
-void Camera::move(MoveDir dir, GLdouble dist) {
+        } else {
+            DBMSG("reset move count");
+            auto_move_count = 30;
+        }
+    }
+
     auto ang_rad = Utils::toRadian(rotate_y);
     auto sel_f = dir == MoveDir::forward ? 1.0 : -1.0;
     auto sel_l = dir == MoveDir::left ? 1.0 : -1.0;
@@ -50,6 +47,15 @@ void Camera::move(MoveDir dir, GLdouble dist) {
             assert("Should not" != "reach here");
             break;
     }
+}
+
+void Camera::autoMove() {
+    if (not auto_move_flag)
+        return;
+    auto_move_count--;
+    if (auto_move_count <= 0)
+        return;
+    move(last_move_dir, last_move_dist, true);
 }
 
 void Camera::turn(TurnDir dir, GLdouble angle) {

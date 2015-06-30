@@ -24,7 +24,6 @@ void Object::drawAxis(float size)
     glPushMatrix();             //NOTE: There is a bug on Mac misbehaviours of
                                 //      the light position when you draw GL_LINES
                                 //      and GL_POINTS. remember the matrix.
-    
     // draw axis
     glLineWidth(3);
     glBegin(GL_LINES);
@@ -63,11 +62,12 @@ void Object::drawAxis(float size)
 GLfloat Cube::default_size_factor = 1.0;
 
 void Cube::display() {
-    rotate[0] += 0.3;
+    autoRotate();
+//    rotate[0] += 0.3;
 //    glMatrixMode(GL_MODELVIEW);
 //    glPushMatrix();
 //    glLoadIdentity();
-//    
+
     // 3. translate
     glTranslatef(center[0], center[1], center[2]);
     // 2. rotate

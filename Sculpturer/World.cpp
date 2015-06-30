@@ -27,6 +27,11 @@ World::World() : camera({0, 0, 0}), window({800, 600}) {
     camera.eye[2] = 10;
     camera.eye[1] = 4;
     camera.rotate_x = 30;
+    camera.move_step = 0.05;
+    camera.auto_move_flag = true;
+    
+    // init auto update
+    update_time = 15;
 }
 
 void World::init() {
@@ -62,7 +67,8 @@ void World::displayHUD() {
     glPushMatrix();
     glLoadIdentity();
     
-    glColor3d(123/255.0, 161/255.0, 168/255.0);
+//    glColor3d(123/255.0, 161/255.0, 168/255.0);
+    glColor3ub(255, 255, 255);
     glRasterPos2i(10, window.size[1] - 20);
     std::string text = "Hello World";
     
@@ -86,9 +92,12 @@ void World::displayHUD() {
 void World::displayObject() {
     glColor3f(0/255.0, 100/255.0, 95/255.0);
     glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    for(auto obj: objs) obj->display();
-    glPopMatrix();
+
+    for(auto obj: objs) {
+        glPushMatrix();
+        obj->display();
+        glPopMatrix();
+    }
 }
 
 void World::display() {
@@ -100,13 +109,11 @@ void World::display() {
     camera.updateLookAt();
 
     glShadeModel(GL_SMOOTH);
-    glEnable(GL_DEPTH_BUFFER_BIT);
-    
-    drawGrid(10, 1);
+    glEnable(GL_DEPTH_TEST);
     
     displayObject();
     displayHUD();
-    
+    drawGrid(10, 1);
     glFlush();
     glutSwapBuffers();
     glutPostRedisplay();
@@ -142,13 +149,14 @@ void World::keyboard(unsigned char key, int x, int y) {
             }
             break;
         /* use default camera controy */
-        case 'w': camera.move(Camera::MoveDir::forward, 1); break;
-        case 's': camera.move(Camera::MoveDir::rear, 1); break;
-        case 'a': camera.move(Camera::MoveDir::left, 1); break;
-        case 'd': camera.move(Camera::MoveDir::right, 1); break;
-        case 'q': camera.move(Camera::MoveDir::up, 1); break;
-        case 'e': camera.move(Camera::MoveDir::down, 1); break;
-        case ' ': camera.reset_rotate(); break;
+        case 'w': camera.move(Camera::MoveDir::forward, 1, false); break;
+        case 's': camera.move(Camera::MoveDir::rear, 1, false); break;
+        case 'a': camera.move(Camera::MoveDir::left, 1, false); break;
+        case 'd': camera.move(Camera::MoveDir::right, 1, false); break;
+        case 'q': camera.move(Camera::MoveDir::up, 1, false); break;
+        case 'e': camera.move(Camera::MoveDir::down, 1, false); break;
+        case ' ': camera.resetRotate(); break;
+        case '1': camera.auto_move_flag = camera.auto_move_flag ? false : true;
         default:
             break;
     }
@@ -168,8 +176,20 @@ void World::mouse(int button, int state, int x, int y) {
 void World::workspace() {
     init();
     auto ob1 = new Cube();
-    ob1->color = {0, 110, 95};
+    ob1->center = {2, 0, 2};
+    ob1->auto_rot_flag = true;
     add(ob1);
+    
+    auto ob2 = new Cube(219, 206, 84);
+    ob2->center = {0, 0, -3};
+//    ob2->auto_rot_flag = false;
+    add(ob2);
+}
+
+void World::auto_update(int id) {
+    globe->camera.autoMove();
+    glutPostRedisplay();
+    glutTimerFunc(globe->update_time, World::auto_update, 0);
 }
 
 void World::drawGrid(GLfloat size, GLfloat step) {

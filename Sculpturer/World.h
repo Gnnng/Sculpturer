@@ -12,8 +12,9 @@
 #include <vector>
 #include <functional>
 
-#include "Object.h"
+#include "Utils.h"
 #include "Camera.h"
+#include "Object.h"
 #include "Window.h"
 
 class World {
@@ -27,12 +28,12 @@ public:
         swipe_r,
         swipe_l
     };
-
-    std::array<GLint, 2>        window_min_size;
+    
     std::vector<Object *>       objs;
     std::array<GLclampf, 4>     bg_color;
     Camera                      camera;
     Window                      window;
+    GLint                       update_time;
     bool init_done;
 
     World();
@@ -45,7 +46,9 @@ public:
     void mouse(int button, int state, int x, int y);
     void reshape(int width, int height);
     void keyboard(unsigned char key, int x, int y);
-
+    void update();
+    static void auto_update(int id);
+    
     void workspace();
     void add(Object *o) { objs.push_back(o); }
     void drawGrid(GLfloat size, GLfloat step);
