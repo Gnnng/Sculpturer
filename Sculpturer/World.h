@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <vector>
 #include "Object.h"
+#include "Camera.h"
 #include <functional>
 
 
@@ -32,13 +33,9 @@ public:
     std::array<GLclampf, 4>     bg_color;
     std::array<GLdouble, 4>     pers;
     std::array<GLint, 2>        view_port_size;
-    std::array<GLdouble, 3>     eye;
-    std::array<GLdouble, 3>     look_c;
-    std::array<GLdouble, 3>     look_dir;
     GLdouble                    reshape_factor;
-    GLdouble                    eye_move_step;
-    std::array<GLdouble, 3>     eye_move;
-    GLdouble                    rotate_x, rotate_y, rotate_z;
+    Camera                      camera;
+    
     bool init_done;
 
     World();
@@ -46,7 +43,6 @@ public:
     
     void displayObject();
     void displayHUD();
-    void lookUpdate();
     void setDefaultValue();
     bool ensureMinWindow(int width, int height);
     void init();
@@ -54,8 +50,7 @@ public:
     void mouse(int button, int state, int x, int y);
     void reshape(int width, int height);
     void keyboard(unsigned char key, int x, int y);
-    GLdouble toDegree(GLdouble rad) { return rad / (3.14159265358/180); }
-    GLdouble toRadian(GLdouble deg) { return deg * 3.14159265358 / 180; }
+
     void workspace();
     void add(Object *o) { objs.push_back(o); }
 };

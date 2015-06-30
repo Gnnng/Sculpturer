@@ -18,15 +18,15 @@ void World::setDefaultValue() {
  changed a lot are explicitly listed in constructor function
  */
     window_min_size = {800, 600};
-    eye_move_step = 0.1;
 }
 
-World::World() {
+World::World() : camera({0, 0, 0}) {
     setDefaultValue();
-    
+
     // color reference: http://zhongguose.com/#tiehui
     bg_color = {55.0/255, 68.0/255, 75.0/255, 1};
     
+    // init flag reset
     init_done = false;
     
     // view_port parameters
@@ -37,11 +37,11 @@ World::World() {
 
     auto ratio = (GLfloat) view_port_size[0] / view_port_size[1];
     pers = {45.0, ratio, 0.1, 100};
-    
-    // look at parameters
-    eye = {0, 0, 10};
-    look_c = {0, 0, -10};
-    look_dir = {0, 0, -10};
+
+    // init camera
+    camera.eye[2] = 10;
+    camera.eye[1] = 4;
+    camera.rotate_x = 30;
     
     reshape_factor = 1.0;
 }
@@ -69,6 +69,8 @@ void World::displayHUD() {
     std::string text = "Hello World";
     
     std::stringstream text_in;
+    auto eye = camera.eye;
+    auto rotate_y = camera.rotate_y;
     text_in << "x: " << eye[0] << " y: " << eye[1] << " z: " << eye[2] << " rotate_y: " << rotate_y;
     auto font = GLUT_BITMAP_9_BY_15;
     for (int i = 0; i < text_in.str().size(); i++) {
@@ -88,31 +90,46 @@ void World::displayObject() {
     for(auto obj: objs) obj->display();
 }
 
-void World::lookUpdate() {
-//    glPushMatrix();
-//    glLoadIdentity();
-//    glGetDoublev(GL_MODELVIEW, matrix);
-//    if (not printed) for(int i = 0; i < 16; i++) {
-//        printed = true;
-//        DBVAR(matrix[i]);
-//    }
-//    glPopMatrix();
+
+void drawAxis(float size)
+{
+    glDepthFunc(GL_ALWAYS);     // to avoid visual artifacts with grid lines
+//    glDisable(GL_LIGHTING);
+    glPushMatrix();             //NOTE: There is a bug on Mac misbehaviours of
+    //      the light position when you draw GL_LINES
+    //      and GL_POINTS. remember the matrix.
     
-//    gluLookAt(eye[0], eye[1], eye[2], eye[0] + look_dir[0], eye[1] + look_dir[1], eye[2] + look_dir[2], 0, 1, 0);
+    // draw axis
+    glLineWidth(3);
+    glBegin(GL_LINES);
+    glColor3f(1, 0, 0);
+    glVertex3f(0, 0, 0);
+    glVertex3f(size, 0, 0);
+    glColor3f(0, 1, 0);
+    glVertex3f(0, 0, 0);
+    glVertex3f(0, size, 0);
+    glColor3f(0, 0, 1);
+    glVertex3f(0, 0, 0);
+    glVertex3f(0, 0, size);
+    glEnd();
+    glLineWidth(1);
     
-    glLoadIdentity();
-    glRotated(rotate_x, 1, 0, 0);
-    glRotated(rotate_y, 0, 1, 0);
-    glRotated(rotate_z, 0, 0, 1);
-    glTranslatef(-eye[0], -eye[1], -eye[2]);
-
-    //    //    glTranslated(-eye_move[0], -eye_move[1], eye_move[2]);
-
-    //    //    glRotated(rotate_x, std::cosl(rotate_y), 0, -std::sinl(rotate_y));
-    //    //    glRotated(rotate_z, std::cosl(rotate_x) * std::sinl(rotate_y), std::sinl(rotate_x), std::cosl(rotate_x) * std::cosl(rotate_y));
-    //    glTranslatef(-eye[0], -eye[1], -eye[2]);
-    //
-
+    // draw arrows(actually big square dots)
+    glPointSize(5);
+    glBegin(GL_POINTS);
+    glColor3f(1, 0, 0);
+    glVertex3f(size, 0, 0);
+    glColor3f(0, 1, 0);
+    glVertex3f(0, size, 0);
+    glColor3f(0, 0, 1);
+    glVertex3f(0, 0, size);
+    glEnd();
+    glPointSize(1);
+    
+    // restore default settings
+    glPopMatrix();
+//    glEnable(GL_LIGHTING);
+    glDepthFunc(GL_LEQUAL);
 }
 
 void World::display() {
@@ -121,13 +138,15 @@ void World::display() {
     
     glMatrixMode(GL_MODELVIEW);
 
-    lookUpdate();
- 
+    camera.updateLookAt();
 
     glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_BUFFER_BIT);
     
+    Utils::drawGrid(10, 1);
+    
     displayObject();
+    drawAxis(2);
     displayHUD();
     
     glFlush();
@@ -177,21 +196,14 @@ void World::keyboard(unsigned char key, int x, int y) {
                     Object::DisplayMode::wire : Object::DisplayMode::solid;
             }
             break;
-        case 's': DBVAR((eye[0] -= eye_move_step * sinl(toRadian(rotate_y)), eye[2] += eye_move_step * cosl(toRadian(rotate_y)))); break;
-        case 'w':
-            DBVAR((eye[0] += eye_move_step * sinl(toRadian(rotate_y)), eye[2] -= eye_move_step * cosl(toRadian(rotate_y)))); break;
-        case 'a': DBVAR((eye[0] -= eye_move_step * cosl(toRadian(rotate_y)), eye[2] -= eye_move_step * sinl(toRadian(rotate_y)))); break;
-        case 'd': DBVAR((eye[0] += eye_move_step * cosl(toRadian(rotate_y)), eye[2] += eye_move_step * sinl(toRadian(rotate_y)))); break;
-        case 'q': DBVAR((eye[1] += eye_move_step)); break; // up
-        case 'e': DBVAR((eye[1] -= eye_move_step)); break; // down
-        case 'y': rotate_y = 45; break;
-//        case 's': DBVAR((eye_move[2] -= eye_move_step)); break;
-//        case 'w': DBVAR((eye_move[2] += eye_move_step)); break;
-//        case 'a': DBVAR((eye_move[0] -= eye_move_step)); break;
-//        case 'd': DBVAR((eye_move[0] += eye_move_step)); break;
-//        case 'q': DBVAR((eye_move[1] += eye_move_step)); break;
-//        case 'e': DBVAR((eye_move[1] -= eye_move_step)); break;
-        case ' ': rotate_x = rotate_y = rotate_z = 0; break;
+        /* use default camera controy */
+        case 'w': camera.move(Camera::MoveDir::forward, 1); break;
+        case 's': camera.move(Camera::MoveDir::rear, 1); break;
+        case 'a': camera.move(Camera::MoveDir::left, 1); break;
+        case 'd': camera.move(Camera::MoveDir::right, 1); break;
+        case 'q': camera.move(Camera::MoveDir::up, 1); break;
+        case 'e': camera.move(Camera::MoveDir::down, 1); break;
+        case ' ': camera.reset_rotate(); break;
         default:
             break;
     }
@@ -199,18 +211,10 @@ void World::keyboard(unsigned char key, int x, int y) {
 
 void World::mouse(int button, int state, int x, int y) {
     switch ((SC_MOUSE)button) {
-        case SC_MOUSE::swipe_u:
-            DBVAR((rotate_x += 0.1));
-            break;
-        case SC_MOUSE::swipe_d:
-            DBVAR((rotate_x -= 0.1));
-            break;
-        case SC_MOUSE::swipe_r:
-            DBVAR((rotate_y -= 0.1));
-            break;
-        case SC_MOUSE::swipe_l:
-            DBVAR((rotate_y += 0.1));
-            break;
+        case SC_MOUSE::swipe_u: camera.turn(Camera::TurnDir::up, 1); break;
+        case SC_MOUSE::swipe_d: camera.turn(Camera::TurnDir::down, 1); break;
+        case SC_MOUSE::swipe_l: camera.turn(Camera::TurnDir::left, 1); break;
+        case SC_MOUSE::swipe_r: camera.turn(Camera::TurnDir::right, 1); break;
         default:
             break;
     }
