@@ -106,16 +106,19 @@ void World::displayObject() {
             obj->display();
             glStencilFunc(GL_NOTEQUAL, 1, -1);
             glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-            glLineWidth(10);
+            glLineWidth(5);
             glPolygonMode(GL_FRONT, GL_LINE);
+
             auto old = obj->color;
-            obj->color = {255, 0, 0};
+            obj->color = {255, 255, 255};
             obj->display();
             obj->color = old;
-            glDisable(GL_STENCIL_TEST);
+
         } else {
+            glDisable(GL_STENCIL_TEST);
             glLineWidth(1);
             glClear(GL_STENCIL_BUFFER_BIT);
+            glPolygonMode(GL_FRONT, GL_FILL);
             obj->display();
         }
         glPopName();
@@ -139,9 +142,8 @@ void World::display() {
     glPushName(0);
     drawGrid(10, 1);
 
-//    displayHUD();
+    displayHUD();
     glPopName();
-    glDisable(GL_DEPTH_TEST);
     glFlush();
     glutSwapBuffers();
     getFPS();
@@ -203,10 +205,10 @@ void World::mouse(int button, int state, int x, int y) {
             }
             break;
 //        case ButtonType::button_r:
-        case ButtonType::swipe_u: camera.turn(Camera::TurnDir::up, 1); break;
-        case ButtonType::swipe_d: camera.turn(Camera::TurnDir::down, 1); break;
-        case ButtonType::swipe_l: camera.turn(Camera::TurnDir::left, 1); break;
-        case ButtonType::swipe_r: camera.turn(Camera::TurnDir::right, 1); break;
+        case ButtonType::swipe_u: camera.turn(Camera::TurnDir::down, 1); break;
+        case ButtonType::swipe_d: camera.turn(Camera::TurnDir::up, 1); break;
+        case ButtonType::swipe_l: camera.turn(Camera::TurnDir::right, 1); break;
+        case ButtonType::swipe_r: camera.turn(Camera::TurnDir::left, 1); break;
         default:
             break;
     }
