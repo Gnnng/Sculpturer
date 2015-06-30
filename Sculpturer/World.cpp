@@ -97,11 +97,6 @@ void World::displayObject() {
     for(auto obj: objs) {
         assert(pick_map.find(obj) != pick_map.end());
         glPushName(pick_map[obj]);
-//        DBVAR(pick_map[obj]);
-        if (pick_id == pick_map[obj]){
-            DBMSG("select " << pick_id);
-        }
-//        obj->display();
         if (pick_id == pick_map[obj]) {
             glClearStencil(0);
             glClear(GL_STENCIL_BUFFER_BIT);
@@ -140,11 +135,16 @@ void World::display() {
     glEnable(GL_DEPTH_TEST);
     
     displayObject();
+
+    glPushName(0);
+    drawGrid(10, 1);
+
 //    displayHUD();
-//    drawGrid(10, 1);
+    glPopName();
+    glDisable(GL_DEPTH_TEST);
     glFlush();
     glutSwapBuffers();
-//    getFPS();
+    getFPS();
 }
 
 void World::reshape(int width, int height) {
@@ -253,7 +253,7 @@ void World::pickObject(int x, int y) {
                 ptr++;
                 DBVAR(*ptr);
                 DBVAR(*(ptr+2));
-                if (*ptr < min) {
+                if (*ptr < min && *(ptr + 2) != 0) {
                     min = *ptr;
                     pick_id = *(ptr + 2);
                 }

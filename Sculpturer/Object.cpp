@@ -88,7 +88,7 @@ void Cube::display() {
             break;
     }
 
-    //drawAxis(1);
+    drawAxis(1);
     glPopMatrix();
 }
 
