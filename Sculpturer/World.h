@@ -9,11 +9,11 @@
 #ifndef __Sculpturer__World__
 #define __Sculpturer__World__
 
-#include <stdio.h>
 #include <vector>
+#include <functional>
+
 #include "Object.h"
 #include "Camera.h"
-#include <functional>
 
 class World {
 public:

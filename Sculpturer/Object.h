@@ -9,12 +9,7 @@
 #ifndef __Sculpturer__Object__
 #define __Sculpturer__Object__
 
-#include <stdio.h>
-#include <GLUT/GLUT.h>
-#include <OpenGL/OpenGL.h> 
-#include <OpenGL/gl.h>
-
-#include <array>
+#include "Utils.h"
 
 
 class Object {

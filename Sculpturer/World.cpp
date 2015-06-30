@@ -8,9 +8,9 @@
 #include <cstdlib>
 #include <cmath>
 #include <algorithm>
-#include "utils.h"
-#include "World.h"
 #include <sstream>
+
+#include "World.h"
 
 void World::setDefaultValue() {
 /*

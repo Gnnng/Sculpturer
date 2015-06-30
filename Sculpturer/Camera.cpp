@@ -6,10 +6,10 @@
 //  Copyright (c) 2015 Gong Deli. All rights reserved.
 //
 
-#include "Camera.h"
 #include <cmath>
-#include "Utils.h"
 #include <cassert>
+
+#include "Camera.h"
 
 void Camera::default_move_control(int key) {
     switch (key) {

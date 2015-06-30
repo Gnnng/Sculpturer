@@ -9,9 +9,7 @@
 #ifndef __Sculpturer__Camera__
 #define __Sculpturer__Camera__
 
-#include <stdio.h>
-#include <array>
-#include <GL/freeglut.h>
+#include "Utils.h"
 
 class Camera {
 public:

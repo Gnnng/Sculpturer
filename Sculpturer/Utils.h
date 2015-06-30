@@ -47,7 +47,16 @@
         std::endl; \
     } while (0)
 
+#include <cmath>
+#include <algorithm>
+#include <array>
+#include <iostream>
+#include <cstring>
+
 #include <GL/freeglut.h>
+#include <GLUT/GLUT.h>
+#include <OpenGL/OpenGL.h>
+#include <OpenGL/gl.h>
 
 class Utils {
 public:

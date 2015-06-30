@@ -8,12 +8,12 @@
 
 #include <iostream>
 #include <string>
-#include <GL/freeglut.h>
-#include <GLUT/GLUT.h>
+
+#include "Utils.h"
 #include "World.h"
 #include "Object.h"
-#include "utils.h"
-#include <cmath>
+
+
 using namespace std;
 
 World* globe; // current world to render
