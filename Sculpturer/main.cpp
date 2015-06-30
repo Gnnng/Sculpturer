@@ -23,8 +23,8 @@ int main(int argc, char * argv[]) {
     
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_MULTISAMPLE | GLUT_DEPTH);
-    glutInitWindowSize(globe->view_port_size[0], globe->view_port_size[1]);
-    glutCreateWindow("Sculpturer");
+    glutInitWindowSize(globe->window.size[0], globe->window.size[1]);
+    glutCreateWindow(globe->window.name.c_str());
     
     DBVAR(glGetString(GL_VERSION));
     DBVAR(glGetString(GL_VENDOR));

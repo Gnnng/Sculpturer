@@ -12,38 +12,21 @@
 
 #include "World.h"
 
-void World::setDefaultValue() {
-/*
- This function init those value those rarely changed in development. Those
- changed a lot are explicitly listed in constructor function
- */
-    window_min_size = {800, 600};
-}
 
-World::World() : camera({0, 0, 0}) {
-    setDefaultValue();
-
+World::World() : camera({0, 0, 0}), window({800, 600}) {
     // color reference: http://zhongguose.com/#tiehui
     bg_color = {55.0/255, 68.0/255, 75.0/255, 1};
     
     // init flag reset
     init_done = false;
     
-    // view_port parameters
-    view_port_size = window_min_size;
+    // init window
+    window.fovy = 45;
     
-    DBVAR(view_port_size[0]);
-    DBVAR(view_port_size[1]);
-
-    auto ratio = (GLfloat) view_port_size[0] / view_port_size[1];
-    pers = {45.0, ratio, 0.1, 100};
-
     // init camera
     camera.eye[2] = 10;
     camera.eye[1] = 4;
     camera.rotate_x = 30;
-    
-    reshape_factor = 1.0;
 }
 
 void World::init() {
@@ -74,13 +57,13 @@ void World::displayHUD() {
     glPushMatrix();
     glLoadIdentity();
     
-    gluOrtho2D(0, view_port_size[0], 0, view_port_size[1]);
+    gluOrtho2D(0, window.size[0], 0, window.size[1]);
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
     
     glColor3d(123/255.0, 161/255.0, 168/255.0);
-    glRasterPos2i(10, view_port_size[1] - 20);
+    glRasterPos2i(10, window.size[1] - 20);
     std::string text = "Hello World";
     
     std::stringstream text_in;
@@ -122,7 +105,6 @@ void World::display() {
     drawGrid(10, 1);
     
     displayObject();
-//    drawAxis(1);
     displayHUD();
     
     glFlush();
@@ -131,33 +113,19 @@ void World::display() {
     getFPS();
 }
 
-bool World::ensureMinWindow(int width, int height) {
-    if (width < window_min_size[0]) {
-        glutReshapeWindow(window_min_size[0], height);
-        return true;
-    }
-    if( height < window_min_size[1]) {
-        glutReshapeWindow(width, window_min_size[1]);
-        return true;
-    }
-    return false;
-}
-
 void World::reshape(int width, int height) {
+    window.size = {width, height};
     init();
-    ensureMinWindow(width, height);
-    DBMSG("window size updated: " << width << "x" << height);
-
-    view_port_size = {width, height};
-    pers[1] = (GLfloat) width / height;
+    DBMSG("window size updated: "
+          << window.size[0] << "x" << window.size[1]);
     
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, window.size[0], window.size[1]);
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
 #warning only perspectvie yet, should support ortho mode also
-    gluPerspective(pers[0], pers[1], pers[2], pers[3]);
+    gluPerspective(window.fovy, window.getAspect(), window.z_near, window.z_far);
 
     glMatrixMode(GL_MODELVIEW);
 }

@@ -14,6 +14,7 @@
 
 #include "Object.h"
 #include "Camera.h"
+#include "Window.h"
 
 class World {
 public:
@@ -30,11 +31,8 @@ public:
     std::array<GLint, 2>        window_min_size;
     std::vector<Object *>       objs;
     std::array<GLclampf, 4>     bg_color;
-    std::array<GLdouble, 4>     pers;
-    std::array<GLint, 2>        view_port_size;
-    GLdouble                    reshape_factor;
     Camera                      camera;
-    
+    Window                      window;
     bool init_done;
 
     World();
@@ -42,8 +40,6 @@ public:
     
     void displayObject();
     void displayHUD();
-    void setDefaultValue();
-    bool ensureMinWindow(int width, int height);
     void init();
     void display();
     void mouse(int button, int state, int x, int y);
