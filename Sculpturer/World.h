@@ -17,7 +17,7 @@
 #include "Camera.h"
 #include "Object.h"
 #include "Window.h"
-
+#include "Light.h"
 class World {
 public:
     enum class ButtonType : int {
@@ -42,13 +42,17 @@ public:
     GLuint                      pick_id = 0;
     GLuint                      pick_count = 0;
     std::map<Object *, int>     pick_map;
+    std::vector<Light>          lights;
     World();
     ~World();
+
+    void init();
     
+    void display();
     void displayObject();
     void displayHUD();
-    void init();
-    void display();
+    void displayLights();
+
     void mouse(int button, int state, int x, int y);
     void reshape(int width, int height);
     void keyboard(unsigned char key, int x, int y);

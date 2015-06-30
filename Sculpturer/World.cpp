@@ -33,6 +33,13 @@ World::World() : camera({0, 0, 0}), window({800, 600}) {
     
     // init auto update
     update_time = 15;
+    
+    // init lights
+    lights = std::vector<Light>(8);
+    for (int i = 0; i < 8; i++) {
+        lights[i] = Light();
+        lights[i].id = i;
+    }
 }
 
 void World::init() {
@@ -111,7 +118,9 @@ void World::displayObject() {
 
             auto old = obj->color;
             obj->color = {255, 255, 255};
+            glDisable(GL_LIGHTING);
             obj->display();
+            glEnable(GL_LIGHTING);
             obj->color = old;
         } else {
             glDisable(GL_STENCIL_TEST);
@@ -124,6 +133,12 @@ void World::displayObject() {
     }
 }
 
+void World::displayLights() {
+    lights[0].position = {8, 8, 0};
+    lights[0].material.ambient = {1, 0, 0, 1};
+    lights[0].material.diffuse = {1, 1, 0, 1};
+    lights[0].open();
+}
 
 void World::display() {
     init();
@@ -136,8 +151,10 @@ void World::display() {
     glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
     
+    displayLights();
     displayObject();
-
+    lights[0].close();
+    
     glPushName(0);
     drawGrid(10, 1);
 

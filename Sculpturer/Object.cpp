@@ -94,8 +94,11 @@ void Cube::display() {
             break;
     }
 
+    
     glScaled(1/w, 1/h, 1/d);
+    glDisable(GL_LIGHTING);
     drawAxis(1);
+    glEnable(GL_LIGHTING);
     glPopMatrix();
 }
 
