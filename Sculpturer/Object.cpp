@@ -19,7 +19,7 @@ std::array<GLfloat, 3> Object::z_axis = {0., 0., 1.};
 GLfloat Cube::default_size_factor = 1.0;
 
 void Cube::display() {
-//    rotate[0] += 0.3;
+    rotate[0] += 0.3;
 //    glMatrixMode(GL_MODELVIEW);
 //    glPushMatrix();
 //    glLoadIdentity();
@@ -31,7 +31,7 @@ void Cube::display() {
     // 1. scale
     glScaled(w, h, d);
     // color
-    glColor3d(1, 0, 0);
+    glColor3ubv(color.data());
     switch (display_mode) {
         case Object::DisplayMode::wire:
             glutWireCube(default_size_factor);

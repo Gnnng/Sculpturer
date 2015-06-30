@@ -20,7 +20,7 @@
 class Object {
 public:
     static std::array<GLfloat, 3> x_axis, y_axis, z_axis;
-    
+    std::array<GLubyte, 3>  color;
     enum class DisplayMode : int {
         wire,
         solid

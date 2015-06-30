@@ -10,6 +10,7 @@
 #include <algorithm>
 #include "utils.h"
 #include "World.h"
+#include <sstream>
 
 void World::setDefaultValue() {
 /*
@@ -17,6 +18,7 @@ void World::setDefaultValue() {
  changed a lot are explicitly listed in constructor function
  */
     window_min_size = {800, 600};
+    eye_move_step = 0.1;
 }
 
 World::World() {
@@ -32,20 +34,16 @@ World::World() {
     
     DBVAR(view_port_size[0]);
     DBVAR(view_port_size[1]);
-    
+
     auto ratio = (GLfloat) view_port_size[0] / view_port_size[1];
     pers = {45.0, ratio, 0.1, 100};
     
     // look at parameters
-    eye = {0, 0, 6};
+    eye = {0, 0, 10};
     look_c = {0, 0, -10};
+    look_dir = {0, 0, -10};
     
     reshape_factor = 1.0;
-}
-
-
-World::~World() {
-    
 }
 
 void World::init() {
@@ -54,23 +52,87 @@ void World::init() {
     init_done = true;
 }
 
+
+void World::displayHUD() {
+/* HUD - head up display */
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    
+    gluOrtho2D(0, view_port_size[0], 0, view_port_size[1]);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    
+    glColor3d(123/255.0, 161/255.0, 168/255.0);
+    glRasterPos2i(10, view_port_size[1] - 20);
+    std::string text = "Hello World";
+    
+    std::stringstream text_in;
+    text_in << "x: " << eye[0] << " y: " << eye[1] << " z: " << eye[2] << " rotate_y: " << rotate_y;
+    auto font = GLUT_BITMAP_9_BY_15;
+    for (int i = 0; i < text_in.str().size(); i++) {
+        char c = text_in.str()[i];
+        glutBitmapCharacter(font, c);
+    }
+
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+}
+
+void World::displayObject() {
+    glColor3f(0/255.0, 100/255.0, 95/255.0);
+    for(auto obj: objs) obj->display();
+}
+
+void World::lookUpdate() {
+//    glPushMatrix();
+//    glLoadIdentity();
+//    glGetDoublev(GL_MODELVIEW, matrix);
+//    if (not printed) for(int i = 0; i < 16; i++) {
+//        printed = true;
+//        DBVAR(matrix[i]);
+//    }
+//    glPopMatrix();
+    
+//    gluLookAt(eye[0], eye[1], eye[2], eye[0] + look_dir[0], eye[1] + look_dir[1], eye[2] + look_dir[2], 0, 1, 0);
+    
+    glLoadIdentity();
+    glRotated(rotate_x, 1, 0, 0);
+    glRotated(rotate_y, 0, 1, 0);
+    glRotated(rotate_z, 0, 0, 1);
+    glTranslatef(-eye[0], -eye[1], -eye[2]);
+
+    //    //    glTranslated(-eye_move[0], -eye_move[1], eye_move[2]);
+
+    //    //    glRotated(rotate_x, std::cosl(rotate_y), 0, -std::sinl(rotate_y));
+    //    //    glRotated(rotate_z, std::cosl(rotate_x) * std::sinl(rotate_y), std::sinl(rotate_x), std::cosl(rotate_x) * std::cosl(rotate_y));
+    //    glTranslatef(-eye[0], -eye[1], -eye[2]);
+    //
+
+}
+
 void World::display() {
     init();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    
-    gluLookAt(eye[0], eye[1], eye[2], look_c[0], look_c[1], look_c[2], 0, 1, 0);
+
+    lookUpdate();
+ 
+
     glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_BUFFER_BIT);
-
-    for(auto obj: objs) {
-        obj->display();
-    }
+    
+    displayObject();
+    displayHUD();
     
     glFlush();
     glutSwapBuffers();
+    glutPostRedisplay();
 }
 
 bool World::ensureMinWindow(int width, int height) {
@@ -107,34 +169,47 @@ void World::reshape(int width, int height) {
 void World::keyboard(unsigned char key, int x, int y) {
     init();
     switch (key) {
-        case 27:
-            exit(0);
-            break;
-        case 's':
+        case 27:    exit(0); break;
+        case '0':
             for(auto &&obj: objs) {
-                obj->display_mode = Object::DisplayMode::solid;
+                obj->display_mode =
+                    (obj->display_mode == Object::DisplayMode::solid) ?
+                    Object::DisplayMode::wire : Object::DisplayMode::solid;
             }
             break;
+        case 's': DBVAR((eye[0] -= eye_move_step * sinl(toRadian(rotate_y)), eye[2] += eye_move_step * cosl(toRadian(rotate_y)))); break;
         case 'w':
-            for(auto &&obj: objs) {
-                obj->display_mode = Object::DisplayMode::wire;
-            }
+            DBVAR((eye[0] += eye_move_step * sinl(toRadian(rotate_y)), eye[2] -= eye_move_step * cosl(toRadian(rotate_y)))); break;
+        case 'a': DBVAR((eye[0] -= eye_move_step * cosl(toRadian(rotate_y)), eye[2] -= eye_move_step * sinl(toRadian(rotate_y)))); break;
+        case 'd': DBVAR((eye[0] += eye_move_step * cosl(toRadian(rotate_y)), eye[2] += eye_move_step * sinl(toRadian(rotate_y)))); break;
+        case 'q': DBVAR((eye[1] += eye_move_step)); break; // up
+        case 'e': DBVAR((eye[1] -= eye_move_step)); break; // down
+        case 'y': rotate_y = 45; break;
+//        case 's': DBVAR((eye_move[2] -= eye_move_step)); break;
+//        case 'w': DBVAR((eye_move[2] += eye_move_step)); break;
+//        case 'a': DBVAR((eye_move[0] -= eye_move_step)); break;
+//        case 'd': DBVAR((eye_move[0] += eye_move_step)); break;
+//        case 'q': DBVAR((eye_move[1] += eye_move_step)); break;
+//        case 'e': DBVAR((eye_move[1] -= eye_move_step)); break;
+        case ' ': rotate_x = rotate_y = rotate_z = 0; break;
+        default:
             break;
-        case 'q':
-            eye[2] += 0.1;
-            DBVAR(eye[2]);
+    }
+}
+
+void World::mouse(int button, int state, int x, int y) {
+    switch ((SC_MOUSE)button) {
+        case SC_MOUSE::swipe_u:
+            DBVAR((rotate_x += 0.1));
             break;
-        case 'e':
-            eye[2] -= 0.1;
-            DBVAR(eye[2]);
+        case SC_MOUSE::swipe_d:
+            DBVAR((rotate_x -= 0.1));
             break;
-        case 'j':
-            reshape_factor -= 0.1;
-            DBVAR(reshape_factor);
+        case SC_MOUSE::swipe_r:
+            DBVAR((rotate_y -= 0.1));
             break;
-        case 'k':
-            reshape_factor += 0.1;
-            DBVAR(reshape_factor);
+        case SC_MOUSE::swipe_l:
+            DBVAR((rotate_y += 0.1));
             break;
         default:
             break;
@@ -143,11 +218,9 @@ void World::keyboard(unsigned char key, int x, int y) {
 
 void World::workspace() {
     init();
-    auto cube1 = new Cube();
-//    cube1->w = cube1->h = 0.2;
-    add(cube1);
+    auto ob1 = new Cube();
+    ob1->color = {0, 110, 95};
+    add(ob1);
 }
 
-void World::add(Object *o) {
-    objs.push_back(o);
-}
+
