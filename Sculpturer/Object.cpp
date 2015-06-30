@@ -70,8 +70,12 @@ void Cube::display() {
     glPushMatrix();
     // 3. translate
     glTranslatef(center[0], center[1], center[2]);
+    
+    glTranslated(moving[0], moving[1], moving[2]);
     // 2. rotate
-    glRotated(rotate[0], rotate[1], rotate[2], rotate[3]);
+    glRotated(rotate[0], 1, 0, 0);
+    glRotated(rotate[1], 0, 1, 0);
+    glRotated(rotate[2], 0, 0, 1);
     // 1. scale
     glScaled(w, h, d);
     // color
@@ -90,6 +94,7 @@ void Cube::display() {
             break;
     }
 
+    glScaled(1/w, 1/h, 1/d);
     drawAxis(1);
     glPopMatrix();
 }

@@ -9,6 +9,7 @@
 #ifndef __Sculpturer__Object__
 #define __Sculpturer__Object__
 
+#include <map>
 #include <GL/freeglut.h>
 #include "Utils.h"
 
@@ -22,11 +23,21 @@ public:
         wire,
         solid
     };
-    std::array<GLfloat, 3> center;              // center (x,y,z)
-    std::array<GLfloat, 3> nx, ny, nz;          // three axies vector
-    GLdouble w, h, d;                           // x_factor, y_factor, z_factror
+    enum class EditMode : int {
+        translate,
+        scale,
+        rotate
+    };
+    enum class ControlType : int {
+        x_inc, x_dec, y_inc, y_dec, z_inc, z_dec, error
+    };
+    std::array<GLfloat, 3>  center;          // center (x,y,z)
+    std::array<GLfloat, 3>  nx, ny, nz;      // three axies vector
+    std::array<GLdouble, 3> moving = {0, 0, 0};
+    GLdouble                w, h, d;         // x_factor, y_factor, z_factror
     std::array<GLdouble, 4> rotate;
-    DisplayMode display_mode;
+    DisplayMode             display_mode;
+    EditMode                edit_mode;
     bool select_flag;
     bool auto_rot_flag;
     
@@ -44,6 +55,64 @@ public:
     void drawAxis(GLfloat size);
     virtual ~Object() {}
     virtual void display() = 0;
+    void keyboard(int key) {
+        static std::map<int, ControlType> key_map = {
+            {'i', ControlType::z_dec},
+            {'k', ControlType::z_inc},
+            {'l', ControlType::x_inc},
+            {'j', ControlType::x_dec},
+            {'u', ControlType::y_inc},
+            {'o', ControlType::y_dec}
+        };
+        
+        auto control = key_map[key];
+        switch (edit_mode) {
+            case EditMode::translate: translateObject(control); break;
+            case EditMode::scale: scaleObject(control); break;
+            case EditMode::rotate: rotateObject(control); break;
+            default:
+                break;
+        }
+    }
+    void translateObject(ControlType c_type) {
+        auto step = 0.1;
+        switch (c_type) {
+            case ControlType::x_inc: moving[0] += step; break;
+            case ControlType::x_dec: moving[0] -= step; break;
+            case ControlType::y_inc: moving[1] += step; break;
+            case ControlType::y_dec: moving[1] -= step; break;
+            case ControlType::z_inc: moving[2] += step; break;
+            case ControlType::z_dec: moving[2] -= step; break;
+            default:
+                break;
+        }
+    }
+    void rotateObject(ControlType c_type) {
+        auto step = 1.0;
+        switch (c_type) {
+            case ControlType::x_inc: rotate[0] += step; break;
+            case ControlType::x_dec: rotate[0] -= step; break;
+            case ControlType::y_inc: rotate[1] += step; break;
+            case ControlType::y_dec: rotate[1] -= step; break;
+            case ControlType::z_inc: rotate[2] += step; break;
+            case ControlType::z_dec: rotate[2] -= step; break;
+            default:
+                break;
+        }
+    }
+    void scaleObject(ControlType c_type) {
+        auto step = 0.1;
+        switch (c_type) {
+            case ControlType::x_inc: w += step; break;
+            case ControlType::x_dec: w -= step; break;
+            case ControlType::y_inc: h += step; break;
+            case ControlType::y_dec: h -= step; break;
+            case ControlType::z_inc: d += step; break;
+            case ControlType::z_dec: d -= step; break;
+            default:
+                break;
+        }
+    }
 };
 
 class Cube :public Object{

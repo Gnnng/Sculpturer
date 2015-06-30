@@ -113,7 +113,6 @@ void World::displayObject() {
             obj->color = {255, 255, 255};
             obj->display();
             obj->color = old;
-
         } else {
             glDisable(GL_STENCIL_TEST);
             glLineWidth(1);
@@ -185,8 +184,26 @@ void World::keyboard(unsigned char key, int x, int y) {
         case 'q': camera.move(Camera::MoveDir::up, 1, false); break;
         case 'e': camera.move(Camera::MoveDir::down, 1, false); break;
         case ' ': camera.resetRotate(); break;
-        case '1': camera.auto_move_flag = camera.auto_move_flag ? false : true;
-        case '2': ((Cube *)objs[0])->nextType(); break;
+        
+        /* control number */
+        case '1': //camera.auto_move_flag = camera.auto_move_flag ? false : true;
+        case '2': //((Cube *)objs[0])->nextType(); break;
+        case '3':
+            if (pick_id > 0) {
+                objs[pick_id - 1]->edit_mode = (Object::EditMode)(key - '1');
+            }
+            break;
+        /* object edit */
+        case 'i':
+        case 'k':
+        case 'j':
+        case 'l':
+        case 'u':
+        case 'o':
+            if (pick_id > 0) {
+                objs[pick_id - 1]->keyboard(key);
+            }
+            break;
         default:
             break;
     }
@@ -199,7 +216,7 @@ void World::mouse(int button, int state, int x, int y) {
             switch ((ButtonState)state) {
                 case ButtonState::down: pickObject(x, y);
                     break;
-                case ButtonState::up: pick_id = 0;
+                case ButtonState::up: //pick_id = 0;
                     break;
                 default:
                     break;
@@ -263,6 +280,11 @@ void World::pickObject(int x, int y) {
                 ptr += size + 2;
             }
             DBVAR(pick_id);
+            if (hits == 1) {
+                pick_id = 0;
+            }
+        } else {
+            
         }
 
     }
