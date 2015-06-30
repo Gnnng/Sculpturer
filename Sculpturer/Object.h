@@ -25,12 +25,12 @@ public:
         wire,
         solid
     };
-    
     std::array<GLfloat, 3> center;              // center (x,y,z)
     std::array<GLfloat, 3> nx, ny, nz;          // three axies vector
     GLdouble w, h, d;                           // x_factor, y_factor, z_factror
     std::array<GLdouble, 4> rotate;
     DisplayMode display_mode;
+    bool select_flag;
     
     Object() :
     center({0, 0, 0}),
@@ -39,6 +39,10 @@ public:
     display_mode(DisplayMode::solid),
     rotate({0, 0, 1, 0})
     {}
+    
+    bool isSelected() { return select_flag; }
+    
+    void drawAxis(GLfloat size);
     virtual ~Object() {}
     virtual void display() = 0;
 };

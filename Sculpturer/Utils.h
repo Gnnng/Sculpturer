@@ -53,39 +53,6 @@ class Utils {
 public:
     static GLdouble toDegree(GLdouble rad) { return rad / (3.14159265358/180); }
     static GLdouble toRadian(GLdouble deg) { return deg * 3.14159265358 / 180; }
-    static void drawGrid(GLfloat size, float step) {
-        // disable lighting
-        //        glDisable(GL_LIGHTING);
-        
-        glBegin(GL_LINES);
-        
-        glColor3f(0.5f, 0.5f, 0.5f);
-        for(float i=step; i <= size; i+= step)
-        {
-            glVertex3f(-size, 0,  i);   // lines parallel to X-axis
-            glVertex3f( size, 0,  i);
-            glVertex3f(-size, 0, -i);   // lines parallel to X-axis
-            glVertex3f( size, 0, -i);
-            
-            glVertex3f( i, 0, -size);   // lines parallel to Z-axis
-            glVertex3f( i, 0,  size);
-            glVertex3f(-i, 0, -size);   // lines parallel to Z-axis
-            glVertex3f(-i, 0,  size);
-        }
-
-        // x-axis
-        glVertex3f(-size, 0, 0);
-        glVertex3f( size, 0, 0);
-        
-        // z-axis
-        glVertex3f(0, 0, -size);
-        glVertex3f(0, 0,  size);
-        
-        glEnd();
-        
-        // enable lighting back
-        //        glEnable(GL_LIGHTING);
-    }
 };
 
 

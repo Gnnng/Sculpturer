@@ -52,6 +52,21 @@ void World::init() {
     init_done = true;
 }
 
+void getFPS()
+{
+    static int frame = 0, time, timebase = 0;
+    static char buffer[256];
+    
+    frame++;
+    time=glutGet(GLUT_ELAPSED_TIME);
+    if (time - timebase > 1000) {
+        sprintf(buffer,"FPS:%4.2f", frame*1000.0/(time-timebase));
+        timebase = time;
+        frame = 0;
+    }
+
+    glutSetWindowTitle(buffer);
+}
 
 void World::displayHUD() {
 /* HUD - head up display */
@@ -87,49 +102,10 @@ void World::displayHUD() {
 
 void World::displayObject() {
     glColor3f(0/255.0, 100/255.0, 95/255.0);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
     for(auto obj: objs) obj->display();
-}
-
-
-void drawAxis(float size)
-{
-    glDepthFunc(GL_ALWAYS);     // to avoid visual artifacts with grid lines
-//    glDisable(GL_LIGHTING);
-    glPushMatrix();             //NOTE: There is a bug on Mac misbehaviours of
-    //      the light position when you draw GL_LINES
-    //      and GL_POINTS. remember the matrix.
-    
-    // draw axis
-    glLineWidth(3);
-    glBegin(GL_LINES);
-    glColor3f(1, 0, 0);
-    glVertex3f(0, 0, 0);
-    glVertex3f(size, 0, 0);
-    glColor3f(0, 1, 0);
-    glVertex3f(0, 0, 0);
-    glVertex3f(0, size, 0);
-    glColor3f(0, 0, 1);
-    glVertex3f(0, 0, 0);
-    glVertex3f(0, 0, size);
-    glEnd();
-    glLineWidth(1);
-    
-    // draw arrows(actually big square dots)
-    glPointSize(5);
-    glBegin(GL_POINTS);
-    glColor3f(1, 0, 0);
-    glVertex3f(size, 0, 0);
-    glColor3f(0, 1, 0);
-    glVertex3f(0, size, 0);
-    glColor3f(0, 0, 1);
-    glVertex3f(0, 0, size);
-    glEnd();
-    glPointSize(1);
-    
-    // restore default settings
     glPopMatrix();
-//    glEnable(GL_LIGHTING);
-    glDepthFunc(GL_LEQUAL);
 }
 
 void World::display() {
@@ -143,15 +119,16 @@ void World::display() {
     glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_BUFFER_BIT);
     
-    Utils::drawGrid(10, 1);
+    drawGrid(10, 1);
     
     displayObject();
-    drawAxis(2);
+//    drawAxis(1);
     displayHUD();
     
     glFlush();
     glutSwapBuffers();
     glutPostRedisplay();
+    getFPS();
 }
 
 bool World::ensureMinWindow(int width, int height) {
@@ -227,4 +204,37 @@ void World::workspace() {
     add(ob1);
 }
 
+void World::drawGrid(GLfloat size, GLfloat step) {
+    // disable lighting
+    //        glDisable(GL_LIGHTING);
+    
+    glBegin(GL_LINES);
+    
+    glColor3f(0.5f, 0.5f, 0.5f);
+    for(float i=step; i <= size; i+= step)
+    {
+        glVertex3f(-size, 0,  i);   // lines parallel to X-axis
+        glVertex3f( size, 0,  i);
+        glVertex3f(-size, 0, -i);   // lines parallel to X-axis
+        glVertex3f( size, 0, -i);
+        
+        glVertex3f( i, 0, -size);   // lines parallel to Z-axis
+        glVertex3f( i, 0,  size);
+        glVertex3f(-i, 0, -size);   // lines parallel to Z-axis
+        glVertex3f(-i, 0,  size);
+    }
+    
+    // x-axis
+    glVertex3f(-size, 0, 0);
+    glVertex3f( size, 0, 0);
+    
+    // z-axis
+    glVertex3f(0, 0, -size);
+    glVertex3f(0, 0,  size);
+    
+    glEnd();
+    
+    // enable lighting back
+    //        glEnable(GL_LIGHTING);
+}
 

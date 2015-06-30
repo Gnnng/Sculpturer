@@ -15,7 +15,6 @@
 #include "Camera.h"
 #include <functional>
 
-
 class World {
 public:
     enum class SC_MOUSE : int {
@@ -53,6 +52,7 @@ public:
 
     void workspace();
     void add(Object *o) { objs.push_back(o); }
+    void drawGrid(GLfloat size, GLfloat step);
 };
 
 #endif /* defined(__Sculpturer__World__) */
