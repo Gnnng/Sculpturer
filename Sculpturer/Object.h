@@ -9,12 +9,14 @@
 #ifndef __Sculpturer__Object__
 #define __Sculpturer__Object__
 
+#include <GL/freeglut.h>
 #include "Utils.h"
-
 
 class Object {
 public:
     static std::array<GLfloat, 3> x_axis, y_axis, z_axis;
+    static GLfloat default_size_factor;
+    
     std::array<GLubyte, 3>  color;
     enum class DisplayMode : int {
         wire,
@@ -46,13 +48,42 @@ public:
 
 class Cube :public Object{
 public:
-    static GLfloat default_size_factor;         //
-    
+    enum class SystemObjectType : int {
+        Cube, Sphere, Torus, Cone, Cylinder, Tetrahedron, Octahedron, Dodecahedron,
+        Icosahedron, RhombicDodecahedron, Teapot, Teacup, Teaspoon
+    };
+    SystemObjectType obj_type = SystemObjectType::Cube;
     Cube() { color = {86, 149, 151}; }
     Cube(GLubyte r, GLubyte g, GLubyte b) { color = {r, g, b}; }
     virtual void display();
+    
+    void drawSystemObject(SystemObjectType obj) {
+        switch (obj) {
+            case SystemObjectType::Cube: glutSolidCube(default_size_factor); break;
+            case SystemObjectType::Sphere: glutSolidSphere(default_size_factor, 10, 10); break;
+            case SystemObjectType::Torus: glutSolidTorus(default_size_factor, 4, 3, 5); break;
+            case SystemObjectType::Cone: glutSolidCone(default_size_factor, 3, 3, 5); break;
+            case SystemObjectType::Cylinder: glutSolidCylinder(1, 5, 10, 10); break;
+            case SystemObjectType::Tetrahedron: glutSolidTetrahedron(); break;
+            case SystemObjectType::Octahedron: glutSolidOctahedron(); break;
+            case SystemObjectType::Dodecahedron: glutSolidDodecahedron(); break;
+            case SystemObjectType::Icosahedron: glutSolidIcosahedron(); break;
+            case SystemObjectType::RhombicDodecahedron: glutSolidRhombicDodecahedron(); break;
+            case SystemObjectType::Teapot: glutSolidTeapot(default_size_factor); break;
+            case SystemObjectType::Teacup: //glutSolidTeacup(default_size_factor); break;
+            case SystemObjectType::Teaspoon: //glutSolidTeaspoon(default_size_factor); break;
+            default:
+                break;
+        }
+    }
+    SystemObjectType nextType() {
+        int val = (int)obj_type;
+        if (val < 11) val++;
+        if (val == 11) val = 0;
+        DBVAR(val);
+        return obj_type = (SystemObjectType)val;
+    }
 };
-
 
 
 #endif /* defined(__Sculpturer__Object__) */

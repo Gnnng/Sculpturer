@@ -186,6 +186,7 @@ void World::keyboard(unsigned char key, int x, int y) {
         case 'e': camera.move(Camera::MoveDir::down, 1, false); break;
         case ' ': camera.resetRotate(); break;
         case '1': camera.auto_move_flag = camera.auto_move_flag ? false : true;
+        case '2': ((Cube *)objs[0])->nextType(); break;
         default:
             break;
     }
@@ -204,7 +205,7 @@ void World::mouse(int button, int state, int x, int y) {
                     break;
             }
             break;
-//        case ButtonType::button_r:
+        case ButtonType::button_r: break;
         case ButtonType::swipe_u: camera.turn(Camera::TurnDir::down, 1); break;
         case ButtonType::swipe_d: camera.turn(Camera::TurnDir::up, 1); break;
         case ButtonType::swipe_l: camera.turn(Camera::TurnDir::right, 1); break;

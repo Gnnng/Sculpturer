@@ -59,10 +59,10 @@ void Object::drawAxis(float size)
 
 // Class Cube
 
-GLfloat Cube::default_size_factor = 1.0;
+GLfloat Object::default_size_factor = 1.0;
 
 void Cube::display() {
-    autoRotate();
+//    autoRotate();
 //    rotate[0] += 0.3;
 //    glMatrixMode(GL_MODELVIEW);
 //    glPushMatrix();
@@ -78,10 +78,12 @@ void Cube::display() {
     glColor3ubv(color.data());
     switch (display_mode) {
         case Object::DisplayMode::wire:
-            glutWireCube(default_size_factor);
+            drawSystemObject((SystemObjectType)obj_type);
+//            glutWireCube(default_size_factor);
             break;
         case Object::DisplayMode::solid:
-            glutSolidCube(default_size_factor);
+            drawSystemObject((SystemObjectType)obj_type);
+//            glutSolidCube(default_size_factor);
             break;
         default:
             glutWireCube(default_size_factor);

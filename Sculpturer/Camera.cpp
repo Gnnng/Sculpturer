@@ -69,7 +69,6 @@ void Camera::turn(TurnDir dir, GLdouble angle) {
     }
 }
 
-
 void Camera::updateLookAt() {
     glLoadIdentity();
     glRotated(rotate_x, 1, 0, 0);
