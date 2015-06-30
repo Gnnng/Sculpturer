@@ -64,5 +64,8 @@ public:
     static GLdouble toRadian(GLdouble deg) { return deg * 3.14159265358 / 180; }
 };
 
+class World;
+extern World* globe;
+
 
 #endif /* __UTILS_H__ */

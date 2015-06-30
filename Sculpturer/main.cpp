@@ -22,7 +22,7 @@ int main(int argc, char * argv[]) {
     globe = new World();
     
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_MULTISAMPLE | GLUT_DEPTH);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_MULTISAMPLE | GLUT_DEPTH | GLUT_STENCIL);
     glutInitWindowSize(globe->window.size[0], globe->window.size[1]);
     glutCreateWindow(globe->window.name.c_str());
     
@@ -45,9 +45,9 @@ int main(int argc, char * argv[]) {
     glutMouseFunc([](int button, int state, int x, int y){
         globe->mouse(button, state, x, y);
     });
-    glutIdleFunc([](){
-        glutPostRedisplay();
-    });
+//    glutIdleFunc([](){
+//        glutPostRedisplay();
+//    });
     
     // TODO: couldn't use c++11 lambda like those above
     glutTimerFunc(globe->update_time, World::auto_update, 0);

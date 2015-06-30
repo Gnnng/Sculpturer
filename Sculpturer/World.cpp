@@ -9,6 +9,7 @@
 #include <cmath>
 #include <algorithm>
 #include <sstream>
+#include <cassert>
 
 #include "World.h"
 
@@ -94,11 +95,38 @@ void World::displayObject() {
     glMatrixMode(GL_MODELVIEW);
 
     for(auto obj: objs) {
-        glPushMatrix();
-        obj->display();
-        glPopMatrix();
+        assert(pick_map.find(obj) != pick_map.end());
+        glPushName(pick_map[obj]);
+//        DBVAR(pick_map[obj]);
+        if (pick_id == pick_map[obj]){
+            DBMSG("select " << pick_id);
+        }
+//        obj->display();
+        if (pick_id == pick_map[obj]) {
+            glClearStencil(0);
+            glClear(GL_STENCIL_BUFFER_BIT);
+            glEnable(GL_STENCIL_TEST);
+            glStencilFunc(GL_ALWAYS, 1, -1);
+            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+            obj->display();
+            glStencilFunc(GL_NOTEQUAL, 1, -1);
+            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+            glLineWidth(10);
+            glPolygonMode(GL_FRONT, GL_LINE);
+            auto old = obj->color;
+            obj->color = {255, 0, 0};
+            obj->display();
+            obj->color = old;
+            glDisable(GL_STENCIL_TEST);
+        } else {
+            glLineWidth(1);
+            glClear(GL_STENCIL_BUFFER_BIT);
+            obj->display();
+        }
+        glPopName();
     }
 }
+
 
 void World::display() {
     init();
@@ -112,12 +140,11 @@ void World::display() {
     glEnable(GL_DEPTH_TEST);
     
     displayObject();
-    displayHUD();
-    drawGrid(10, 1);
+//    displayHUD();
+//    drawGrid(10, 1);
     glFlush();
     glutSwapBuffers();
-    glutPostRedisplay();
-    getFPS();
+//    getFPS();
 }
 
 void World::reshape(int width, int height) {
@@ -163,15 +190,81 @@ void World::keyboard(unsigned char key, int x, int y) {
 }
 
 void World::mouse(int button, int state, int x, int y) {
-    switch ((SC_MOUSE)button) {
-        case SC_MOUSE::swipe_u: camera.turn(Camera::TurnDir::up, 1); break;
-        case SC_MOUSE::swipe_d: camera.turn(Camera::TurnDir::down, 1); break;
-        case SC_MOUSE::swipe_l: camera.turn(Camera::TurnDir::left, 1); break;
-        case SC_MOUSE::swipe_r: camera.turn(Camera::TurnDir::right, 1); break;
+//    DBVAR(button); DBVAR(state);
+    switch ((ButtonType)button) {
+        case ButtonType::button_l:
+            switch ((ButtonState)state) {
+                case ButtonState::down: pickObject(x, y);
+                    break;
+                case ButtonState::up: pick_id = 0;
+                    break;
+                default:
+                    break;
+            }
+            break;
+//        case ButtonType::button_r:
+        case ButtonType::swipe_u: camera.turn(Camera::TurnDir::up, 1); break;
+        case ButtonType::swipe_d: camera.turn(Camera::TurnDir::down, 1); break;
+        case ButtonType::swipe_l: camera.turn(Camera::TurnDir::left, 1); break;
+        case ButtonType::swipe_r: camera.turn(Camera::TurnDir::right, 1); break;
         default:
             break;
     }
 }
+
+void World::pickObject(int x, int y) {
+    {
+        // start picking
+        GLint viewport[4];
+        glSelectBuffer((GLsizei)sel_buf.size(), sel_buf.data());
+        glRenderMode(GL_SELECT);
+        
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+        
+        glGetIntegerv(GL_VIEWPORT, viewport);
+        gluPickMatrix(x, viewport[3] - y, sel_area_size[0], sel_area_size[1], viewport);
+        gluPerspective(window.fovy, window.getAspect(), window.z_near, window.z_far);
+        glMatrixMode(GL_MODELVIEW);
+        glInitNames();
+        DBMSG("Picking start");
+    }
+    
+    display();
+    
+    {
+        // finish picking
+        DBMSG("Picking finished");
+        int hits;
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+        glFlush();
+
+        hits = glRenderMode(GL_RENDER);
+        if (hits != 0) {
+            //            processHits(hits, selectBuf);
+            DBMSG("Pick hits = " << hits);
+            GLuint min = 0xffffffff;
+            GLuint *ptr = sel_buf.data();
+            for (auto i = 0; i < hits; i++) {
+                int size = *ptr;
+                ptr++;
+                DBVAR(*ptr);
+                DBVAR(*(ptr+2));
+                if (*ptr < min) {
+                    min = *ptr;
+                    pick_id = *(ptr + 2);
+                }
+                ptr += size + 2;
+            }
+            DBVAR(pick_id);
+        }
+
+    }
+}
+
 
 void World::workspace() {
     init();

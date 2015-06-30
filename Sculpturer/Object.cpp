@@ -67,7 +67,7 @@ void Cube::display() {
 //    glMatrixMode(GL_MODELVIEW);
 //    glPushMatrix();
 //    glLoadIdentity();
-
+    glPushMatrix();
     // 3. translate
     glTranslatef(center[0], center[1], center[2]);
     // 2. rotate
@@ -88,7 +88,8 @@ void Cube::display() {
             break;
     }
 
-    drawAxis(1);
+    //drawAxis(1);
+    glPopMatrix();
 }
 
 

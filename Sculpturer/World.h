@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <functional>
+#include <map>
 
 #include "Utils.h"
 #include "Camera.h"
@@ -19,7 +20,7 @@
 
 class World {
 public:
-    enum class SC_MOUSE : int {
+    enum class ButtonType : int {
         button_l, // 0
         button_m, // not captured
         button_r,
@@ -28,14 +29,19 @@ public:
         swipe_r,
         swipe_l
     };
-    
+    enum class ButtonState : int { down, up };
+
     std::vector<Object *>       objs;
     std::array<GLclampf, 4>     bg_color;
     Camera                      camera;
     Window                      window;
     GLint                       update_time;
     bool init_done;
-
+    std::array<GLuint, 1000>    sel_buf;
+    std::array<GLint, 2>        sel_area_size = {5, 5};
+    GLuint                      pick_id = 0;
+    GLuint                      pick_count = 0;
+    std::map<Object *, int>     pick_map;
     World();
     ~World();
     
@@ -48,9 +54,10 @@ public:
     void keyboard(unsigned char key, int x, int y);
     void update();
     static void auto_update(int id);
+    void pickObject(int x, int y);
     
     void workspace();
-    void add(Object *o) { objs.push_back(o); }
+    void add(Object *o) { objs.push_back(o); pick_map[o] = ++pick_count; DBVAR(pick_map[o]);}
     void drawGrid(GLfloat size, GLfloat step);
 };
 
