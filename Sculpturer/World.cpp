@@ -220,6 +220,31 @@ void World::keyboard(unsigned char key, int x, int y) {
             if (pick_id > 0) {
                 DBMSG("control id " << pick_id);
                 objs[pick_id - 1]->edit_mode = (Object::EditMode)(key - '1');
+                
+            }
+            break;
+        case '4':
+            if (pick_id > 0) {
+                ((Cube *)objs[pick_id - 1])->edit_mode = Object::EditMode::change;
+                ((Cube *)objs[pick_id - 1])->nextType();
+            }
+            break;
+        case '5':
+        case '6':
+        case '7':
+            if (pick_id > 0) {
+                DBVAR((key - '5'));
+                ((Cube *)objs[pick_id - 1])->edit_mode = Object::EditMode::material;
+                ((Cube *)objs[pick_id - 1])->editMaterial(key - '5');
+            }
+            break;
+        case 'z':
+        case 'x':
+        case 'c':
+            if (pick_id > 0 && objs[pick_id - 1]->edit_mode == Object::EditMode::material) {
+                auto sel_rgb_chan = (std::map<int, int>){{'z', 0}, {'x', 1}, {'c', 2}}[key];
+                DBVAR(sel_rgb_chan);
+                ((Cube *)objs[pick_id - 1])->changeChannel(sel_rgb_chan);
             }
             break;
         /* object edit */
@@ -232,6 +257,10 @@ void World::keyboard(unsigned char key, int x, int y) {
             if (pick_id > 0) {
                 objs[pick_id - 1]->keyboard(key);
             }
+            break;
+        
+        case 'p':
+            printScreen();
             break;
         default:
             break;
@@ -252,8 +281,20 @@ void World::mouse(int button, int state, int x, int y) {
             }
             break;
         case ButtonType::button_r: break;
-        case ButtonType::swipe_u: camera.turn(Camera::TurnDir::down, 1); break;
-        case ButtonType::swipe_d: camera.turn(Camera::TurnDir::up, 1); break;
+        case ButtonType::swipe_u:
+//            DBMSG("swipe up");
+            if (pick_id > 0 && objs[pick_id - 1]->edit_mode == Object::EditMode::material)
+                objs[pick_id - 1]->changeMaterial(1);
+            else
+                camera.turn(Camera::TurnDir::down, 1);
+            break;
+        case ButtonType::swipe_d:
+//            DBMSG("pick_id is " << pick_id << " editmode is " << (int)objs[pick_id]->edit_mode);
+            if (pick_id > 0 && objs[pick_id - 1]->edit_mode == Object::EditMode::material)
+                objs[pick_id - 1]->changeMaterial(-1);
+            else
+                camera.turn(Camera::TurnDir::up, 1);
+            break;
         case ButtonType::swipe_l: camera.turn(Camera::TurnDir::right, 1); break;
         case ButtonType::swipe_r: camera.turn(Camera::TurnDir::left, 1); break;
         default:
@@ -294,14 +335,14 @@ void World::pickObject(int x, int y) {
         hits = glRenderMode(GL_RENDER);
         if (hits != 0) {
             //            processHits(hits, selectBuf);
-            DBMSG("Pick hits = " << hits);
+//            DBMSG("Pick hits = " << hits);
             GLuint min = 0xffffffff;
             GLuint *ptr = sel_buf.data();
             for (auto i = 0; i < hits; i++) {
                 int size = *ptr;
                 ptr++;
-                DBVAR(*ptr);
-                DBVAR(*(ptr+2));
+//                DBVAR(*ptr);
+//                DBVAR(*(ptr+2));
                 if (*ptr < min && *(ptr + 2) != 0) {
                     min = *ptr;
                     pick_id = *(ptr + 2);
@@ -365,11 +406,12 @@ void World::workspace() {
     ob1->center = {2, 0, 2};
     ob1->auto_rot_flag = true;
     add(ob1);
-    
-    auto ob2 = new Cube(219, 206, 84);
+    ob1->initMaterial();
+//    auto ob2 = new Cube(219, 206, 84);
+    auto ob2 = new Cube(255, 0, 0);
     ob2->center = {0, 0, -3};
     add(ob2);
-    
+    ob2->initMaterial();
     
     lights[0].center = {8, 8, 0};
     lights[0].color = {255, 0, 0};

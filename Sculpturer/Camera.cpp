@@ -18,7 +18,7 @@ void Camera::move(MoveDir dir, GLdouble dist, bool auto_call) {
         if (auto_call) {
 
         } else {
-            DBMSG("reset move count");
+//            DBMSG("reset move count");
             auto_move_count = 30;
         }
     }

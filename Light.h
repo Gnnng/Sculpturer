@@ -16,7 +16,7 @@
 class Light : public Object {
 public:
     GLuint              id = -1;     // OpenGL light id (0~7), -1 = not init
-    Material            material;
+                                     //Material            material;
     std::array<GLfloat, 4>  position;
     bool                isInfinite = false;
     

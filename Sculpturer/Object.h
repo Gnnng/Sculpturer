@@ -30,7 +30,9 @@ public:
     enum class EditMode : int {
         translate,
         scale,
-        rotate
+        rotate,
+        change,
+        material
     };
     enum class ControlType : int {
         x_inc, x_dec, y_inc, y_dec, z_inc, z_dec, error
@@ -41,7 +43,9 @@ public:
     GLdouble                w, h, d;         // x_factor, y_factor, z_factror
     std::array<GLdouble, 4> rotate;
     DisplayMode             display_mode;
-    EditMode                edit_mode;
+    EditMode                edit_mode = EditMode::translate;
+    int                     material_sel = 0;
+    int                     rgb_channel = 0;
     bool select_flag;
     bool auto_rot_flag;
 
@@ -56,8 +60,15 @@ public:
     display_mode(DisplayMode::solid),
     rotate({0, 0, 1, 0}),
     auto_rot_flag(false)
-    {}
-
+    {
+    }
+    
+    void initMaterial() {
+        material.ambient = {static_cast<GLfloat>(color[0]/255.0), static_cast<GLfloat>(color[1]/255.0), static_cast<GLfloat>(color[2]/255.0), 1};
+        material.diffuse = {static_cast<GLfloat>(color[0]/255.0), static_cast<GLfloat>(color[1]/255.0), static_cast<GLfloat>(color[2]/255.0), 1};
+        material.emission = {0, 0, 0, 1};
+    }
+    
     bool isSelected() { return select_flag; }
     void autoRotate() { if (auto_rot_flag) rotate[0] += 1; };
     void drawAxis(GLfloat size);
@@ -70,7 +81,7 @@ public:
             {'l', ControlType::x_inc},
             {'j', ControlType::x_dec},
             {'u', ControlType::y_inc},
-            {'o', ControlType::y_dec}
+            {'o', ControlType::y_dec},
         };
         
         auto control = key_map[key];
@@ -81,6 +92,44 @@ public:
             default:
                 break;
         }
+    }
+    void editMaterial(int index) {
+        material_sel = index;
+        std::array<GLfloat, 4> *mat = nullptr;
+        switch (material_sel) {
+            case 0: mat = &(material.ambient); break;
+            case 1: mat = &(material.diffuse); break;
+            case 2: mat = &(material.specular); break;
+            default:
+                mat = nullptr;
+                break;
+        }
+        if (mat)
+            DBMSG("Select material " << mat->at(0) << " " << mat->at(1) << " " << mat->at(2));
+    }
+    void changeChannel(int chan) {
+        rgb_channel = chan;
+    }
+    void changeMaterial(int dir) {
+        DBMSG("change material " << material_sel << " rgb: " << rgb_channel << " dir " << dir);
+        auto pos = 1.0/255;
+        auto neg = -pos;
+        GLfloat* x;
+        switch (material_sel) {
+            case 0: x = material.ambient.data() + rgb_channel; break;
+            case 1: x = material.diffuse.data() + rgb_channel; break;
+            case 2: x = material.specular.data() + rgb_channel; break;
+            default:
+                break;
+        }
+        *x += (dir > 0) ? pos : neg;
+        if (*x > 0.99999999) {
+            *x = 1.0;
+        }
+        if (*x < 0.00000001) {
+            *x = 0;
+        }
+        DBVAR(*x);
     }
     void translateObject(ControlType c_type) {
         auto step = 0.1;
@@ -136,17 +185,17 @@ public:
     
     void drawSystemObject(SystemObjectType obj) {
         switch (obj) {
-            case SystemObjectType::Cube: glutSolidCube(default_size_factor); break;
-            case SystemObjectType::Sphere: glutSolidSphere(default_size_factor, 10, 10); break;
-            case SystemObjectType::Torus: glutSolidTorus(default_size_factor, 4, 3, 5); break;
-            case SystemObjectType::Cone: glutSolidCone(default_size_factor, 3, 3, 5); break;
-            case SystemObjectType::Cylinder: glutSolidCylinder(1, 5, 10, 10); break;
+            case SystemObjectType::Cube: glutSolidCube(1); break;
+            case SystemObjectType::Sphere: glutSolidSphere(1, 30, 30); break;
+            case SystemObjectType::Torus: glutSolidTorus(0.2, 1, 30, 30); break;
+            case SystemObjectType::Cone: glutSolidCone(1, 3, 30, 30); break;
+            case SystemObjectType::Cylinder: glutSolidCylinder(0.5, 2, 10, 10); break;
             case SystemObjectType::Tetrahedron: glutSolidTetrahedron(); break;
             case SystemObjectType::Octahedron: glutSolidOctahedron(); break;
             case SystemObjectType::Dodecahedron: glutSolidDodecahedron(); break;
             case SystemObjectType::Icosahedron: glutSolidIcosahedron(); break;
             case SystemObjectType::RhombicDodecahedron: glutSolidRhombicDodecahedron(); break;
-            case SystemObjectType::Teapot: glutSolidTeapot(default_size_factor); break;
+            case SystemObjectType::Teapot: glutSolidTeapot(1); break;
             case SystemObjectType::Teacup: //glutSolidTeacup(default_size_factor); break;
             case SystemObjectType::Teaspoon: //glutSolidTeaspoon(default_size_factor); break;
             default:
@@ -155,8 +204,8 @@ public:
     }
     SystemObjectType nextType() {
         int val = (int)obj_type;
-        if (val < 11) val++;
-        if (val == 11) val = 0;
+        if (val < 10) val++;
+        if (val == 10) val = 0;
         DBVAR(val);
         return obj_type = (SystemObjectType)val;
     }

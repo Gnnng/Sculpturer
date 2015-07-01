@@ -12,12 +12,16 @@
 #include <vector>
 #include <functional>
 #include <map>
+#include <string>
+#include <sstream>
 
 #include "Utils.h"
 #include "Camera.h"
 #include "Object.h"
 #include "Window.h"
 #include "Light.h"
+#include "Bmp.h"
+
 class World {
 public:
     enum class ButtonType : int {
@@ -59,6 +63,14 @@ public:
     void update();
     static void auto_update(int id);
     void pickObject(int x, int y);
+    void printScreen() {
+        static int count = 0;
+        std::ostringstream fname;
+        fname << "screenshots-" << count << ".bmp";
+        GLubyte* pixels = new GLubyte[3 * window.size[0] * window.size[1]];
+        glReadPixels(0, 0, window.size[0], window.size[1], GL_RGB, GL_UNSIGNED_BYTE, (GLvoid* )pixels);
+        SaveImage((char *)fname.str().c_str(), (void *)pixels, window.size[0], window.size[1]);
+    }
     
     void workspace();
     void add(Object *o) { objs.push_back(o); pick_map[o] = ++pick_count; DBVAR(pick_map[o]);}
