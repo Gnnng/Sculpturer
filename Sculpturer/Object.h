@@ -67,6 +67,8 @@ public:
     void initMaterial() {
         material.ambient = {static_cast<GLfloat>(color[0]/255.0), static_cast<GLfloat>(color[1]/255.0), static_cast<GLfloat>(color[2]/255.0), 1};
         material.diffuse = {static_cast<GLfloat>(color[0]/255.0), static_cast<GLfloat>(color[1]/255.0), static_cast<GLfloat>(color[2]/255.0), 1};
+        material.specular = {static_cast<GLfloat>(color[0]/255.0), static_cast<GLfloat>(color[1]/255.0), static_cast<GLfloat>(color[2]/255.0), 1};
+        material.shininess = {};
         material.emission = {0, 0, 0, 1};
     }
     

@@ -24,7 +24,7 @@ public:
         material.ambient = {0, 0, 0, 1};
         material.diffuse = {0, 0, 0, 1};
         material.specular = {0, 0, 0, 1};
-        material.shininess = {0, 0, 0, 1};
+        material.shininess = {0};
         position = {5, 5, 5, 1};
         center = {5, 5, 5};
     }
@@ -32,7 +32,7 @@ public:
     void open() {
         glLightfv(toGLID(id), GL_AMBIENT, material.ambient.data());
         glLightfv(toGLID(id), GL_DIFFUSE, material.diffuse.data());
-//        glLightfv(toGLID(id), GL_SPECULAR, material.specular.data());
+        glLightfv(toGLID(id), GL_SPECULAR, material.specular.data());
         glLightfv(toGLID(id), GL_POSITION, position.data());
         glEnable(GL_LIGHTING);
         glEnable(toGLID(id));
@@ -50,9 +50,10 @@ public:
 //        glColorMaterial(GL_FRONT, GL_DIFFUSE);
 //        glColorMaterial(GL_FRONT, GL_EMISSION);
         glColor3ub(255, 255, 255);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, highlight.data());
-        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, highlight.data());
-        glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, highlight.data());
+        glMaterialfv(GL_FRONT, GL_AMBIENT, highlight.data());
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, highlight.data());
+        glMaterialfv(GL_FRONT, GL_SPECULAR, highlight.data());
+        glMaterialfv(GL_FRONT, GL_EMISSION, highlight.data());
         glutSolidSphere(0.2, 30, 30);
         glDisable(GL_LIGHTING);
         if (axis)

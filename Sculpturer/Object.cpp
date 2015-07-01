@@ -72,6 +72,8 @@ void Cube::display() {
 
     glMaterialfv(GL_FRONT, GL_AMBIENT, material.ambient.data());
     glMaterialfv(GL_FRONT, GL_DIFFUSE, material.diffuse.data());
+    glMaterialfv(GL_FRONT, GL_SPECULAR, material.specular.data());
+    glMaterialfv(GL_FRONT, GL_SHININESS, material.shininess.data());
     glMaterialfv(GL_FRONT, GL_EMISSION, material.emission.data());
     glPushMatrix();
     // 3. translate
@@ -120,6 +122,8 @@ void Custom::display() {
     
     glMaterialfv(GL_FRONT, GL_AMBIENT, material.ambient.data());
     glMaterialfv(GL_FRONT, GL_DIFFUSE, material.diffuse.data());
+    glMaterialfv(GL_FRONT, GL_SPECULAR, material.specular.data());
+    glMaterialfv(GL_FRONT, GL_SHININESS, material.shininess.data());
     glMaterialfv(GL_FRONT, GL_EMISSION, material.emission.data());
     glPushMatrix();
     // 3. translate

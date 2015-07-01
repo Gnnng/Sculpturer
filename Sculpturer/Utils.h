@@ -65,8 +65,9 @@ public:
 };
 
 struct Material {
-    static std::array<GLfloat, 4> no_color, white_diffuse;
-    std::array<GLfloat, 4>   ambient, diffuse, specular, shininess, emission;
+    static std::array<GLfloat, 4>   no_color, white_diffuse;
+    std::array<GLfloat, 4>          ambient, diffuse, specular, emission;
+    std::array<GLfloat, 4>          shininess;
 };
 
 class World;
