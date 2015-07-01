@@ -44,7 +44,6 @@ int main(int argc, char * argv[]) {
         globe->keyboard(key, x, y);
     });
     glutMouseFunc([](int button, int state, int x, int y){
-        DBMSG("This is button change " << button << " state " << state);
         globe->mouse(button, state, x, y);
     });
 //    glutIdleFunc([](){

@@ -13,8 +13,12 @@
 #include <GL/freeglut.h>
 #include "Utils.h"
 
+//namespace sc {
+
 class Object {
 public:
+    /* member variables */
+    
     static std::array<GLfloat, 3> x_axis, y_axis, z_axis;
     static GLfloat default_size_factor;
     
@@ -33,13 +37,17 @@ public:
     };
     std::array<GLfloat, 3>  center;          // center (x,y,z)
     std::array<GLfloat, 3>  nx, ny, nz;      // three axies vector
-    std::array<GLdouble, 3> moving = {0, 0, 0};
+//    std::array<GLdouble, 3> moving = {0, 0, 0};
     GLdouble                w, h, d;         // x_factor, y_factor, z_factror
     std::array<GLdouble, 4> rotate;
     DisplayMode             display_mode;
     EditMode                edit_mode;
     bool select_flag;
     bool auto_rot_flag;
+
+    Material                material;
+    
+    /* member functions */
     
     Object() :
     center({0, 0, 0}),
@@ -77,12 +85,12 @@ public:
     void translateObject(ControlType c_type) {
         auto step = 0.1;
         switch (c_type) {
-            case ControlType::x_inc: moving[0] += step; break;
-            case ControlType::x_dec: moving[0] -= step; break;
-            case ControlType::y_inc: moving[1] += step; break;
-            case ControlType::y_dec: moving[1] -= step; break;
-            case ControlType::z_inc: moving[2] += step; break;
-            case ControlType::z_dec: moving[2] -= step; break;
+            case ControlType::x_inc: center[0] += step; break;
+            case ControlType::x_dec: center[0] -= step; break;
+            case ControlType::y_inc: center[1] += step; break;
+            case ControlType::y_dec: center[1] -= step; break;
+            case ControlType::z_inc: center[2] += step; break;
+            case ControlType::z_dec: center[2] -= step; break;
             default:
                 break;
         }
@@ -154,5 +162,5 @@ public:
     }
 };
 
-
+//}
 #endif /* defined(__Sculpturer__Object__) */

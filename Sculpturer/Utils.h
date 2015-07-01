@@ -64,6 +64,11 @@ public:
     static GLdouble toRadian(GLdouble deg) { return deg * 3.14159265358 / 180; }
 };
 
+struct Material {
+    static std::array<GLfloat, 4> no_color, white_diffuse;
+    std::array<GLfloat, 4>   ambient, diffuse, specular, shininess, emission;
+};
+
 class World;
 extern World* globe;
 

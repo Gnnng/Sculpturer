@@ -71,7 +71,7 @@ void Cube::display() {
     // 3. translate
     glTranslatef(center[0], center[1], center[2]);
     
-    glTranslated(moving[0], moving[1], moving[2]);
+//    glTranslated(moving[0], moving[1], moving[2]);
     // 2. rotate
     glRotated(rotate[0], 1, 0, 0);
     glRotated(rotate[1], 0, 1, 0);

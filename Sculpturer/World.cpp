@@ -100,7 +100,7 @@ void World::displayHUD() {
 void World::displayObject() {
     glColor3f(0/255.0, 100/255.0, 95/255.0);
     glMatrixMode(GL_MODELVIEW);
-
+    
     for(auto obj: objs) {
         assert(pick_map.find(obj) != pick_map.end());
         glPushName(pick_map[obj]);
@@ -134,9 +134,9 @@ void World::displayObject() {
 }
 
 void World::displayLights() {
-    lights[0].position = {8, 8, 0};
-    lights[0].material.ambient = {1, 0, 0, 1};
-    lights[0].material.diffuse = {1, 1, 0, 1};
+    lights[0].material.ambient = {1, 1, 1, 1};
+    lights[0].material.diffuse = {1, 1, 1, 1};
+    lights[0].material.emission = {1, 1, 1, 1};
     lights[0].open();
 }
 
@@ -207,6 +207,7 @@ void World::keyboard(unsigned char key, int x, int y) {
         case '2': //((Cube *)objs[0])->nextType(); break;
         case '3':
             if (pick_id > 0) {
+                DBMSG("control id " << pick_id);
                 objs[pick_id - 1]->edit_mode = (Object::EditMode)(key - '1');
             }
             break;
@@ -319,6 +320,8 @@ void World::workspace() {
     ob2->center = {0, 0, -3};
 //    ob2->auto_rot_flag = false;
     add(ob2);
+    lights[0].center = {8, 8, 0};
+    add(&lights[0]);
 }
 
 void World::auto_update(int id) {

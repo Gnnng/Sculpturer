@@ -7,6 +7,3 @@
 //
 
 #include "Light.h"
-
-std::array<GLfloat, 4> Material::no_color = {0, 0, 0, 1};
-std::array<GLfloat, 4> Material::white_diffuse = {1, 1, 1, 1};
