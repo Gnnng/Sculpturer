@@ -134,10 +134,21 @@ void World::displayObject() {
 }
 
 void World::displayLights() {
-    lights[0].material.ambient = {1, 1, 1, 1};
+    lights[0].material.ambient = {0, 0, 0, 1};
     lights[0].material.diffuse = {1, 1, 1, 1};
-    lights[0].material.emission = {1, 1, 1, 1};
+//    lights[0].material.emission = {1, 1, 1, 1};
+    std::array<GLfloat, 4> model_ambient = {0.4f, 0.4f, 0.4f, 0.4f};
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, model_ambient.data());
+    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 0);
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
     lights[0].open();
+    lights[1].material.ambient = {0, 0, 0, 1};
+    lights[1].material.diffuse = {0.5, 0.5, 0.5, 1};
+//    lights[1].material.emission = {1, 1, 1, 1};
+    lights[1].isInfinite = true;
+    lights[1].position = {0, 20, 0, 0};
+    lights[1].open();
+
 }
 
 void World::display() {
@@ -308,22 +319,6 @@ void World::pickObject(int x, int y) {
     }
 }
 
-
-void World::workspace() {
-    init();
-    auto ob1 = new Cube();
-    ob1->center = {2, 0, 2};
-    ob1->auto_rot_flag = true;
-    add(ob1);
-    
-    auto ob2 = new Cube(219, 206, 84);
-    ob2->center = {0, 0, -3};
-//    ob2->auto_rot_flag = false;
-    add(ob2);
-    lights[0].center = {8, 8, 0};
-    add(&lights[0]);
-}
-
 void World::auto_update(int id) {
     globe->camera.autoMove();
     glutPostRedisplay();
@@ -362,5 +357,22 @@ void World::drawGrid(GLfloat size, GLfloat step) {
     
     // enable lighting back
     //        glEnable(GL_LIGHTING);
+}
+
+void World::workspace() {
+    init();
+    auto ob1 = new Cube();
+    ob1->center = {2, 0, 2};
+    ob1->auto_rot_flag = true;
+    add(ob1);
+    
+    auto ob2 = new Cube(219, 206, 84);
+    ob2->center = {0, 0, -3};
+    add(ob2);
+    
+    
+    lights[0].center = {8, 8, 0};
+    lights[0].color = {255, 0, 0};
+    add(&lights[0]);
 }
 

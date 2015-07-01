@@ -67,6 +67,14 @@ void Cube::display() {
 //    glMatrixMode(GL_MODELVIEW);
 //    glPushMatrix();
 //    glLoadIdentity();
+//    glColorMaterial(GL_FRONT, GL_AMBIENT);
+//    glColorMaterial(GL_FRONT, GL_DIFFUSE);
+    std::array<GLfloat, 4> ambient = {static_cast<GLfloat>(color[0]/255.0), static_cast<GLfloat>(color[1]/255.0), static_cast<GLfloat>(color[2]/255.0), 1};
+    std::array<GLfloat, 4> diffuse = {static_cast<GLfloat>(color[0]/255.0), static_cast<GLfloat>(color[1]/255.0), static_cast<GLfloat>(color[2]/255.0), 1};
+    std:array<GLfloat, 4> no_mat = {0, 0, 0, 1};
+    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient.data());
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse.data());
+    glMaterialfv(GL_FRONT, GL_EMISSION, no_mat.data());
     glPushMatrix();
     // 3. translate
     glTranslatef(center[0], center[1], center[2]);
