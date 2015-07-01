@@ -10,6 +10,7 @@
 #define __Sculpturer__Object__
 
 #include <map>
+#include <vector>
 #include <GL/freeglut.h>
 #include "Utils.h"
 
@@ -48,7 +49,7 @@ public:
     int                     rgb_channel = 0;
     bool select_flag;
     bool auto_rot_flag;
-
+    bool axis = true;
     Material                material;
     
     /* member functions */
@@ -209,6 +210,34 @@ public:
         DBVAR(val);
         return obj_type = (SystemObjectType)val;
     }
+};
+
+class Custom: public Object {
+public:
+    std::vector<GLfloat>        vertices;
+    std::vector<GLushort>       faces;
+    std::vector<GLfloat>        vert_normal;
+    
+    Custom(std::vector<GLfloat> vert, std::vector<GLushort> faces, std::vector<GLfloat> vert_normal) :
+    vertices(vert), faces(faces), vert_normal(vert_normal) {}
+
+    void displayCustom() {
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glNormalPointer(GL_FLOAT, 0, vert_normal.data());
+        glVertexPointer(3, GL_FLOAT, 0, vertices.data());
+        
+        glBegin(GL_TRIANGLES);
+        for(int i = 0; i < faces.size() / 3; i++) {
+            for(int j = 0; j < 3; j++) {
+                glArrayElement(faces[i*3+j]);
+            }
+        }
+        glEnd();
+        glDisableClientState(GL_NORMAL_ARRAY);
+        glDisableClientState(GL_VERTEX_ARRAY);
+    }
+    virtual void display();
 };
 
 //}

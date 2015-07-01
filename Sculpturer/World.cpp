@@ -10,9 +10,11 @@
 #include <algorithm>
 #include <sstream>
 #include <cassert>
+#include <iostream>
+#include <fstream>
 
 #include "World.h"
-
+#include "Object.h"
 
 World::World() : camera({0, 0, 0}), window({800, 600}) {
     // color reference: http://zhongguose.com/#tiehui
@@ -65,6 +67,8 @@ void getFPS()
 }
 
 void World::displayHUD() {
+    if (not hud)
+        return;
 /* HUD - head up display */
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -258,9 +262,34 @@ void World::keyboard(unsigned char key, int x, int y) {
                 objs[pick_id - 1]->keyboard(key);
             }
             break;
-        
+        case '=':
+            {
+                auto obj = new Cube();
+                obj->initMaterial();
+                add(obj);
+            }
+            break;
+        case '-':
+            if (pick_id > 0) {
+                objs.erase(objs.begin() + pick_id - 1);
+            }
+            break;
         case 'p':
             printScreen();
+            break;
+        case 'g':
+            grid = grid ? false : true;
+            break;
+        case 'h':
+            hud = hud ? false : true;
+            break;
+        case 'n':
+            for(auto obj : objs) {
+                obj->axis = obj->axis ? false : true;
+            }
+            break;
+        case 'y':
+            importObject();
             break;
         default:
             break;
@@ -367,6 +396,8 @@ void World::auto_update(int id) {
 }
 
 void World::drawGrid(GLfloat size, GLfloat step) {
+    if (not grid)
+        return;
     // disable lighting
     //        glDisable(GL_LIGHTING);
     
@@ -400,6 +431,54 @@ void World::drawGrid(GLfloat size, GLfloat step) {
     //        glEnable(GL_LIGHTING);
 }
 
+void World::importObject() {
+    std::vector<GLushort>   faces;
+    std::vector<GLfloat>    vert_normals;
+    std::vector<GLfloat>    vertices;
+    
+    std::ifstream fin("import.obj");
+    std::string head;
+    try {
+        while (fin >> head) {
+            if (head == "f") {
+                GLushort p1, p2, p3;
+                fin >> p1 >> p2 >> p3;
+                faces.push_back(p1);
+                faces.push_back(p2);
+                faces.push_back(p3);
+            } else if (head == "v") {
+                GLfloat p1, p2, p3;
+                fin >> p1 >> p2 >> p3;
+                vertices.push_back(p1);
+                vertices.push_back(p2);
+                vertices.push_back(p3);
+            } else if (head == "vn") {
+                GLfloat p1, p2, p3;
+                fin >> p1 >> p2 >> p3;
+                vert_normals.push_back(p1);
+                vert_normals.push_back(p2);
+                vert_normals.push_back(p3);
+            } else {
+                std::string line_tail;
+                std::getline(fin, line_tail);
+                DBMSG("dump comment " << line_tail);
+            }
+        }
+    } catch (...) {
+        std::cout << "Import error" << std::endl;
+        exit(1);
+    }
+
+    DBMSG("Import read finished");
+    fin.close();
+    DBVAR(sizeof(vertices.data()));
+    DBVAR(faces.size());
+    DBVAR(vert_normals.size());
+    auto newob = new Custom(vertices, faces, vert_normals);
+    newob->initMaterial();
+    add(newob);
+}
+
 void World::workspace() {
     init();
     auto ob1 = new Cube();
@@ -407,8 +486,8 @@ void World::workspace() {
     ob1->auto_rot_flag = true;
     add(ob1);
     ob1->initMaterial();
-//    auto ob2 = new Cube(219, 206, 84);
-    auto ob2 = new Cube(255, 0, 0);
+    auto ob2 = new Cube(219, 206, 84);
+//    auto ob2 = new Cube(255, 0, 0);
     ob2->center = {0, 0, -3};
     add(ob2);
     ob2->initMaterial();
@@ -417,4 +496,3 @@ void World::workspace() {
     lights[0].color = {255, 0, 0};
     add(&lights[0]);
 }
-

@@ -100,10 +100,47 @@ void Cube::display() {
             break;
     }
 
+    glScaled(1/w, 1/h, 1/d);
+    glDisable(GL_LIGHTING);
+    if (axis)
+        drawAxis(1);
+    glEnable(GL_LIGHTING);
+    glPopMatrix();
+}
+
+
+void Custom::display() {
+    //    autoRotate();
+    //    rotate[0] += 0.3;
+    //    glMatrixMode(GL_MODELVIEW);
+    //    glPushMatrix();
+    //    glLoadIdentity();
+    //    glColorMaterial(GL_FRONT, GL_AMBIENT);
+    //    glColorMaterial(GL_FRONT, GL_DIFFUSE);
+    
+    glMaterialfv(GL_FRONT, GL_AMBIENT, material.ambient.data());
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, material.diffuse.data());
+    glMaterialfv(GL_FRONT, GL_EMISSION, material.emission.data());
+    glPushMatrix();
+    // 3. translate
+    glTranslatef(center[0], center[1], center[2]);
+    
+    //    glTranslated(moving[0], moving[1], moving[2]);
+    // 2. rotate
+    glRotated(rotate[0], 1, 0, 0);
+    glRotated(rotate[1], 0, 1, 0);
+    glRotated(rotate[2], 0, 0, 1);
+    // 1. scale
+    glScaled(w, h, d);
+    // color
+    glColor3ubv(color.data());
+
+    displayCustom();
     
     glScaled(1/w, 1/h, 1/d);
     glDisable(GL_LIGHTING);
-    drawAxis(1);
+    if (axis)
+        drawAxis(1);
     glEnable(GL_LIGHTING);
     glPopMatrix();
 }

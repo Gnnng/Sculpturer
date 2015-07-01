@@ -47,6 +47,8 @@ public:
     GLuint                      pick_count = 0;
     std::map<Object *, int>     pick_map;
     std::vector<Light>          lights;
+    bool                        grid = true;
+    bool                        hud = true;
     World();
     ~World();
 
@@ -71,10 +73,11 @@ public:
         glReadPixels(0, 0, window.size[0], window.size[1], GL_RGB, GL_UNSIGNED_BYTE, (GLvoid* )pixels);
         SaveImage((char *)fname.str().c_str(), (void *)pixels, window.size[0], window.size[1]);
     }
-    
+
     void workspace();
     void add(Object *o) { objs.push_back(o); pick_map[o] = ++pick_count; DBVAR(pick_map[o]);}
     void drawGrid(GLfloat size, GLfloat step);
+    void importObject();
 };
 
 #endif /* defined(__Sculpturer__World__) */

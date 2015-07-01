@@ -55,7 +55,8 @@ public:
         glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, highlight.data());
         glutSolidSphere(0.2, 30, 30);
         glDisable(GL_LIGHTING);
-        drawAxis(0.5);
+        if (axis)
+            drawAxis(0.5);
         glEnable(GL_LIGHTING);
         glPopMatrix();
     }
