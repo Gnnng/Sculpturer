@@ -44,9 +44,20 @@ World::World() : camera({0, 0, 0}), window({800, 600}) {
     }
 }
 
-void World::init() {
-    if (not init_done)
-        glClearColor(bg_color[0], bg_color[1], bg_color[2], bg_color[3]);
+void World::init(int argc, char **argv) {
+    if (init_done)
+        return;
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_MULTISAMPLE | GLUT_DEPTH | GLUT_STENCIL);
+    glutInitWindowSize(globe->window.size[0], globe->window.size[1]);
+    glutCreateWindow(globe->window.name.c_str());
+    
+    DBVAR(glGetString(GL_VERSION));
+    DBVAR(glGetString(GL_VENDOR));
+    DBVAR(glGetString(GL_RENDERER));
+    DBVAR(GLUT_API_VERSION);
+    
+    glClearColor(bg_color[0], bg_color[1], bg_color[2], bg_color[3]);
     init_done = true;
 }
 
@@ -156,7 +167,7 @@ void World::displayLights() {
 }
 
 void World::display() {
-    init();
+//    init();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     glMatrixMode(GL_MODELVIEW);
@@ -182,7 +193,7 @@ void World::display() {
 
 void World::reshape(int width, int height) {
     window.size = {width, height};
-    init();
+//    init();
     DBMSG("window size updated: "
           << window.size[0] << "x" << window.size[1]);
     
@@ -198,137 +209,137 @@ void World::reshape(int width, int height) {
 }
 
 void World::keyboard(unsigned char key, int x, int y) {
-    init();
+//    init();
     switch (key) {
-        case 27:    exit(0); break;
-        case '0':
-            for(auto &&obj: objs) {
-                obj->display_mode =
-                    (obj->display_mode == Object::DisplayMode::solid) ?
-                    Object::DisplayMode::wire : Object::DisplayMode::solid;
-            }
-            break;
-        /* use default camera controy */
-        case 'w': camera.move(Camera::MoveDir::forward, 1, false); break;
-        case 's': camera.move(Camera::MoveDir::rear, 1, false); break;
-        case 'a': camera.move(Camera::MoveDir::left, 1, false); break;
-        case 'd': camera.move(Camera::MoveDir::right, 1, false); break;
-        case 'q': camera.move(Camera::MoveDir::up, 1, false); break;
-        case 'e': camera.move(Camera::MoveDir::down, 1, false); break;
-        case ' ': camera.resetRotate(); break;
+case 27:    exit(0); break;
+case '0':
+    for(auto &&obj: objs) {
+        obj->display_mode =
+            (obj->display_mode == Object::DisplayMode::solid) ?
+            Object::DisplayMode::wire : Object::DisplayMode::solid;
+    }
+    break;
+/* use default camera controy */
+case 'w': camera.move(Camera::MoveDir::forward, 1, false); break;
+case 's': camera.move(Camera::MoveDir::rear, 1, false); break;
+case 'a': camera.move(Camera::MoveDir::left, 1, false); break;
+case 'd': camera.move(Camera::MoveDir::right, 1, false); break;
+case 'q': camera.move(Camera::MoveDir::up, 1, false); break;
+case 'e': camera.move(Camera::MoveDir::down, 1, false); break;
+case ' ': camera.resetRotate(); break;
+
+/* control number */
+case '1': //camera.auto_move_flag = camera.auto_move_flag ? false : true;
+case '2': //((Cube *)objs[0])->nextType(); break;
+case '3':
+    if (pick_id > 0) {
+        DBMSG("control id " << pick_id);
+        objs[pick_id - 1]->edit_mode = (Object::EditMode)(key - '1');
         
-        /* control number */
-        case '1': //camera.auto_move_flag = camera.auto_move_flag ? false : true;
-        case '2': //((Cube *)objs[0])->nextType(); break;
-        case '3':
-            if (pick_id > 0) {
-                DBMSG("control id " << pick_id);
-                objs[pick_id - 1]->edit_mode = (Object::EditMode)(key - '1');
-                
-            }
-            break;
-        case '4':
-            if (pick_id > 0) {
-                ((Cube *)objs[pick_id - 1])->edit_mode = Object::EditMode::change;
-                ((Cube *)objs[pick_id - 1])->nextType();
-            }
-            break;
-        case '5':
-        case '6':
-        case '7':
-            if (pick_id > 0) {
-                DBVAR((key - '5'));
-                ((Cube *)objs[pick_id - 1])->edit_mode = Object::EditMode::material;
-                ((Cube *)objs[pick_id - 1])->editMaterial(key - '5');
-            }
-            break;
-        case 'z':
-        case 'x':
-        case 'c':
-            if (pick_id > 0 && objs[pick_id - 1]->edit_mode == Object::EditMode::material) {
-                auto sel_rgb_chan = (std::map<int, int>){{'z', 0}, {'x', 1}, {'c', 2}}[key];
-                DBVAR(sel_rgb_chan);
-                ((Cube *)objs[pick_id - 1])->changeChannel(sel_rgb_chan);
-            }
-            break;
-        /* object edit */
-        case 'i':
-        case 'k':
-        case 'j':
-        case 'l':
-        case 'u':
-        case 'o':
-            if (pick_id > 0) {
-                objs[pick_id - 1]->keyboard(key);
-            }
-            break;
-        case '=':
-            {
-                auto obj = new Cube();
-                obj->initMaterial();
-                add(obj);
-            }
-            break;
-        case '-':
-            if (pick_id > 0) {
-                objs.erase(objs.begin() + pick_id - 1);
-            }
-            break;
-        case 'p':
-            printScreen();
-            break;
-        case 'g':
-            grid = grid ? false : true;
-            break;
-        case 'h':
-            hud = hud ? false : true;
-            break;
-        case 'n':
-            for(auto obj : objs) {
-                obj->axis = obj->axis ? false : true;
-            }
-            break;
-        case 'y':
-            importObject();
-            break;
-        default:
-            break;
+    }
+    break;
+case '4':
+    if (pick_id > 0) {
+        ((Cube *)objs[pick_id - 1])->edit_mode = Object::EditMode::change;
+        ((Cube *)objs[pick_id - 1])->nextType();
+    }
+    break;
+case '5':
+case '6':
+case '7':
+    if (pick_id > 0) {
+        DBVAR((key - '5'));
+        ((Cube *)objs[pick_id - 1])->edit_mode = Object::EditMode::material;
+        ((Cube *)objs[pick_id - 1])->editMaterial(key - '5');
+    }
+    break;
+case 'z':
+case 'x':
+case 'c':
+    if (pick_id > 0 && objs[pick_id - 1]->edit_mode == Object::EditMode::material) {
+        auto sel_rgb_chan = (std::map<int, int>){{'z', 0}, {'x', 1}, {'c', 2}}[key];
+        DBVAR(sel_rgb_chan);
+        ((Cube *)objs[pick_id - 1])->changeChannel(sel_rgb_chan);
+    }
+    break;
+/* object edit */
+case 'i':
+case 'k':
+case 'j':
+case 'l':
+case 'u':
+case 'o':
+    if (pick_id > 0) {
+        objs[pick_id - 1]->keyboard(key);
+    }
+    break;
+case '=':
+    {
+        auto obj = new Cube();
+        obj->initMaterial();
+        add(obj);
+    }
+    break;
+case '-':
+    if (pick_id > 0) {
+        objs.erase(objs.begin() + pick_id - 1);
+    }
+    break;
+case 'p':
+    printScreen();
+    break;
+case 'g':
+    grid = grid ? false : true;
+    break;
+case 'h':
+    hud = hud ? false : true;
+    break;
+case 'n':
+    for(auto obj : objs) {
+        obj->axis = obj->axis ? false : true;
+    }
+    break;
+case 'y':
+    importObject();
+    break;
+default:
+    break;
     }
 }
 
 void World::mouse(int button, int state, int x, int y) {
 //    DBVAR(button); DBVAR(state);
-    switch ((ButtonType)button) {
-        case ButtonType::button_l:
-            switch ((ButtonState)state) {
-                case ButtonState::down: pickObject(x, y);
-                    break;
-                case ButtonState::up: //pick_id = 0;
-                    break;
-                default:
-                    break;
-            }
-            break;
-        case ButtonType::button_r: break;
-        case ButtonType::swipe_u:
+switch ((ButtonType)button) {
+    case ButtonType::button_l:
+        switch ((ButtonState)state) {
+            case ButtonState::down: pickObject(x, y);
+                break;
+            case ButtonState::up: //pick_id = 0;
+                break;
+            default:
+                break;
+        }
+        break;
+    case ButtonType::button_r: break;
+    case ButtonType::swipe_u:
 //            DBMSG("swipe up");
-            if (pick_id > 0 && objs[pick_id - 1]->edit_mode == Object::EditMode::material)
-                objs[pick_id - 1]->changeMaterial(1);
-            else
-                camera.turn(Camera::TurnDir::down, 1);
-            break;
-        case ButtonType::swipe_d:
+        if (pick_id > 0 && objs[pick_id - 1]->edit_mode == Object::EditMode::material)
+            objs[pick_id - 1]->changeMaterial(1);
+        else
+            camera.turn(Camera::TurnDir::down, 1);
+        break;
+    case ButtonType::swipe_d:
 //            DBMSG("pick_id is " << pick_id << " editmode is " << (int)objs[pick_id]->edit_mode);
-            if (pick_id > 0 && objs[pick_id - 1]->edit_mode == Object::EditMode::material)
-                objs[pick_id - 1]->changeMaterial(-1);
-            else
-                camera.turn(Camera::TurnDir::up, 1);
-            break;
-        case ButtonType::swipe_l: camera.turn(Camera::TurnDir::right, 1); break;
-        case ButtonType::swipe_r: camera.turn(Camera::TurnDir::left, 1); break;
-        default:
-            break;
-    }
+        if (pick_id > 0 && objs[pick_id - 1]->edit_mode == Object::EditMode::material)
+            objs[pick_id - 1]->changeMaterial(-1);
+        else
+            camera.turn(Camera::TurnDir::up, 1);
+        break;
+    case ButtonType::swipe_l: camera.turn(Camera::TurnDir::right, 1); break;
+    case ButtonType::swipe_r: camera.turn(Camera::TurnDir::left, 1); break;
+    default:
+        break;
+}
 }
 
 void World::pickObject(int x, int y) {
@@ -480,7 +491,7 @@ void World::importObject() {
 }
 
 void World::workspace() {
-    init();
+//    init();
     auto ob1 = new Cube();
     ob1->center = {2, 0, 2};
     ob1->auto_rot_flag = true;

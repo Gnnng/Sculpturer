@@ -40,19 +40,19 @@ public:
     Camera                      camera;
     Window                      window;
     GLint                       update_time;
-    bool init_done;
     std::array<GLuint, 1000>    sel_buf;
     std::array<GLint, 2>        sel_area_size = {5, 5};
     GLuint                      pick_id = 0;
     GLuint                      pick_count = 0;
     std::map<Object *, int>     pick_map;
     std::vector<Light>          lights;
+    bool                        init_done;
     bool                        grid = true;
     bool                        hud = true;
     World();
     ~World();
 
-    void init();
+    void init(int argc, char **);
     
     void display();
     void displayObject();
@@ -68,7 +68,7 @@ public:
     void printScreen() {
         static int count = 0;
         std::ostringstream fname;
-        fname << "screenshots-" << count << ".bmp";
+        fname << "screenshots-" << count++ << ".bmp";
         GLubyte* pixels = new GLubyte[3 * window.size[0] * window.size[1]];
         glReadPixels(0, 0, window.size[0], window.size[1], GL_RGB, GL_UNSIGNED_BYTE, (GLvoid* )pixels);
         SaveImage((char *)fname.str().c_str(), (void *)pixels, window.size[0], window.size[1]);

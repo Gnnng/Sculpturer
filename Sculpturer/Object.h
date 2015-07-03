@@ -19,11 +19,6 @@
 class Object {
 public:
     /* member variables */
-    
-    static std::array<GLfloat, 3> x_axis, y_axis, z_axis;
-    static GLfloat default_size_factor;
-    
-    std::array<GLubyte, 3>  color;
     enum class DisplayMode : int {
         wire,
         solid
@@ -38,19 +33,24 @@ public:
     enum class ControlType : int {
         x_inc, x_dec, y_inc, y_dec, z_inc, z_dec, error
     };
+    
+    static std::array<GLfloat, 3> x_axis, y_axis, z_axis;
+    static GLfloat default_size_factor;
+    
+    std::array<GLubyte, 3>  color;
     std::array<GLfloat, 3>  center;          // center (x,y,z)
     std::array<GLfloat, 3>  nx, ny, nz;      // three axies vector
-//    std::array<GLdouble, 3> moving = {0, 0, 0};
     GLdouble                w, h, d;         // x_factor, y_factor, z_factror
     std::array<GLdouble, 4> rotate;
     DisplayMode             display_mode;
     EditMode                edit_mode = EditMode::translate;
+    Material                material;
     int                     material_sel = 0;
     int                     rgb_channel = 0;
     bool select_flag;
     bool auto_rot_flag;
     bool axis = true;
-    Material                material;
+
     
     /* member functions */
     
@@ -185,10 +185,11 @@ public:
     Cube() { color = {86, 149, 151}; }
     Cube(GLubyte r, GLubyte g, GLubyte b) { color = {r, g, b}; }
     virtual void display();
+
     
     void drawSystemObject(SystemObjectType obj) {
         switch (obj) {
-            case SystemObjectType::Cube: glutSolidCube(1); break;
+            case SystemObjectType::Cube: glutSolidCube(1);break;
             case SystemObjectType::Sphere: glutSolidSphere(1, 30, 30); break;
             case SystemObjectType::Torus: glutSolidTorus(0.2, 1, 30, 30); break;
             case SystemObjectType::Cone: glutSolidCone(1, 3, 30, 30); break;
@@ -204,14 +205,14 @@ public:
             default:
                 break;
         }
-    }
-    SystemObjectType nextType() {
-        int val = (int)obj_type;
-        if (val < 10) val++;
-        if (val == 10) val = 0;
-        DBVAR(val);
-        return obj_type = (SystemObjectType)val;
-    }
+}
+SystemObjectType nextType() {
+    int val = (int)obj_type;
+    if (val < 10) val++;
+    if (val == 10) val = 0;
+    DBVAR(val);
+    return obj_type = (SystemObjectType)val;
+}
 };
 
 class Custom: public Object {
